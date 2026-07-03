@@ -86,9 +86,18 @@ const config: Config = {
         indexDocs: true,        // Set to true to index docs
       },
     ],
+    require.resolve("docusaurus-plugin-image-zoom"),
   ],
 
   themeConfig: {
+    // Click any doc image to open it in a larger lightbox
+    zoom: {
+      selector: '.markdown img:not(.no-zoom)',
+      background: {
+        light: 'rgb(255, 255, 255)',
+        dark: 'rgb(30, 30, 30)',
+      },
+    },
     // App Service Labs social card
     image: 'img/app-service-labs-social-card.png',
     navbar: {
