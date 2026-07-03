@@ -1,0 +1,8 @@
+{
+  "label": "Migration & Modernization",
+  "position": 12,
+  "link": {
+    "type": "generated-index",
+    "description": "Move existing apps to App Service and modernize legacy Windows workloads. Under construction."
+  }
+}

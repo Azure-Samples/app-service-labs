@@ -1,0 +1,8 @@
+{
+  "label": "Deployment & CI/CD",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Get your code onto App Service and automate it — deployment options, GitHub Actions, Azure DevOps, and slots. Under construction."
+  }
+}

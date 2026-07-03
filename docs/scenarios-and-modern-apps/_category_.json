@@ -1,0 +1,8 @@
+{
+  "label": "Scenarios & Modern Apps",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Hands-on, end-to-end scenarios that go beyond the reference docs — host MCP servers, AI apps, and secure APIs on App Service. Under construction."
+  }
+}
