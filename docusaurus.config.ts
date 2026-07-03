@@ -105,6 +105,11 @@ const config: Config = {
           label: 'Workshops',
         },
         {
+          href: 'https://azure.github.io/AppService/',
+          label: 'Blog',
+          position: 'left',
+        },
+        {
           href: 'https://github.com/Azure-Samples/app-service-labs',
           label: 'GitHub',
           position: 'right',
