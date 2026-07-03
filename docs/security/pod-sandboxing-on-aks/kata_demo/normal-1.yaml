@@ -1,0 +1,11 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: normal-1
+spec:
+  containers:
+  - name: normal-1
+    image: mcr.microsoft.com/aks/fundamental/base-ubuntu:v0.0.11
+    command: ["/bin/sh", "-ec", "while :; do echo '.'; sleep 5 ; done"]
+    securityContext:
+      privileged: true

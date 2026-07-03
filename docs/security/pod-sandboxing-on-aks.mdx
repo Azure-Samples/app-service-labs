@@ -1,0 +1,427 @@
+---
+sidebar_position: 4
+title: Pod Sandboxing on AKS
+sidebar_label: "Pod Sandboxing"
+---
+
+import Prerequisites from "../../src/components/SharedMarkdown/_prerequisites.mdx";
+import ProvisionResourceGroup from "../../src/components/SharedMarkdown/_provision_resource_group.mdx";
+
+[Pod Sandboxing on AKS](https://learn.microsoft.com/azure/aks/use-pod-sandboxing), currently in Public Preview, provides an isolation boundary between the container application and the shared kernel and compute resources of the container host such as CPU, memory, and networking.
+
+Traditionally, Kubernetes deployments rely on namespace isolation. Namespaces don't protect against kernel-level attacks, because:
+
+- All containers share the same kernel.
+- Vulnerability in the kernel (e.g., dirty COW, runc escape, Spectre/Meltdown side channels) can allow cross-container attacks.
+- If a container escapes its namespace, it could compromise other containers or the host.
+
+This is especially risky in multi-tenant clusters, where:
+
+- One tenant's workload might be malicious or compromised.
+- Traditional namespace isolation won't stop a kernel-level exploit from jumping across tenants.
+
+Kata Containers are ideal when you need strong tenant isolation—for example:
+
+- SaaS platforms with untrusted workloads
+- Regulated environments (e.g., finance, healthcare)
+- Running low-trust 3rd-party code
+- Clusters with shared responsibility models
+
+## Objectives
+
+As you progress through the workshop, you will learn how to:
+
+- Set up a workplace environment
+- Deploying pods (Kata and non-Kata)
+- Explore resource isolation between Kata pods and non-Kata pods utilizing the open-source [Kubernetes Goat](https://madhuakula.com/kubernetes-goat/) repo.
+
+<Prerequisites />
+<ProvisionResourceGroup />
+
+### Pod Sandboxing Concepts
+
+Please also familiarize yourself with the basic concepts laid out, and ensure you have the prerequisites laid out in the Microsoft Learn page for [Pod Sandboxing on AKS](https://learn.microsoft.com/azure/aks/use-pod-sandboxing).
+
+As we are using Kubernetes Goat, there are some requirements that it requires as well. [Please ensure you have those set up](https://madhuakula.com/kubernetes-goat/docs/how-to-run/kubernetes-goat-on-microsoft-azure-kubernetes-cluster).
+
+You can either spin up a new cluster or add node pools to an existing cluster to experiment with the Pod Sandboxing feature.
+
+For the purposes of this lab, we will create a new cluster with Pod Sandboxing enabled.
+
+### Setup AKS Cluster
+
+Set the AKS cluster name.
+
+```bash
+export AKS_NAME=myakscluster$RAND
+```
+
+When deploying a new AKS cluster with Pod Sandboxing enabled, you can simply call on `az aks create` to create a new cluster. When setting up the clusters, however, please specify the following parameters:
+
+- `--workload-runtime`: Should be `KataMshvVmIsolation` to enable the Pod Sandboxing feature in the node pool. With this parameter selected, the subsequent two parameters must fit the requirements, or else an error will be returned.
+- `--os-sku`: Ensure you select `AzureLinux`, as that is the only OS that supports this feature currently.
+- `--node-vm-size`: Please ensure you select a VM size that both supports generation 2 VMs and nested virtualization. The [Dsv3 series](https://learn.microsoft.com/azure/virtual-machines/sizes/general-purpose/dsv3-series?tabs=sizebasic) of VMs are a great example.
+
+:::warning
+
+Pod Sandboxing on AKS is currently in Public Preview, so you will need to register the following feature using Azure CLI.
+
+```bash
+az feature register --namespace Microsoft.ContainerService --name KataVMIsolationPreview
+```
+
+:::
+
+Run the following command to create an AKS cluster with pod sandboxing enabled.
+
+```bash
+az aks create \
+--name ${AKS_NAME} \
+--resource-group ${RG_NAME} \
+--os-sku AzureLinux \
+--workload-runtime KataMshvVmIsolation \
+--node-vm-size Standard_D4s_v3 \
+--node-count 1 \
+--generate-ssh-keys
+```
+
+Once the AKS cluster has been created, run the following command to connect to it.
+
+```bash
+az aks get-credentials \
+--resource-group ${RG_NAME} \
+--name ${AKS_NAME}
+```
+
+### Setup Kubernetes GOAT
+
+Kubernetes Goat is an intentionally vulnerable Kubernetes cluster designed for learning and practicing Kubernetes security. We will be borrowing sample container images to demonstrate isolation benefits from using pod sandboxing.
+
+Once your cluster is up and running, navigate to a location that you would like the Kubernetes Goat files to sit at.
+
+```bash
+cd <location_path_of_your_choice>
+```
+
+Once there, clone the repo:
+
+```bash
+git clone https://github.com/madhuakula/kubernetes-goat.git`
+```
+
+Then navigate into the folder it is installed at:
+
+```bash
+cd kubernetes-goat
+```
+
+:::info
+
+Use this as your working directory for the remainder of the workshop.
+
+:::
+
+Kubernetes GOAT offers a [number of scenarios](https://madhuakula.com/kubernetes-goat/docs/scenarios) that one can go through to test their pod's security. For the purposes of this lab, we will only go through a few scenarios that will best illustrate the effect of Pod Sandboxes.
+
+## Privileged Kata Pods
+
+At points in this lab, we will be running some privileged Kata pods. This requires you to [configure your containerd Kata runtime appropriately](https://github.com/kata-containers/kata-containers/blob/main/docs/how-to/privileged.md).
+
+A quick method to do so will be via launching a debug pod. Run the following commands to get the name of the node then start interactively debugging it:
+
+```bash
+NODE_NAME=$(kubectl get nodes -ojsonpath='{.items[0].metadata.name}')
+kubectl debug node/$NODE_NAME -it --image=ubuntu:22.04 -- bash
+```
+
+Once in your node, you will need to modify files. We will use `vim` for this. Install `vim` using the following command.
+
+```bash
+apt update && apt install vim -y
+```
+
+Once vim is installed, edit the containerd config by running the following command:
+
+```bash
+vim /host/etc/containerd/config.toml
+```
+
+Look for the section under `[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.kata]` (on line 22)
+
+Move your cursor to the end of the line and press the letter O on your keyboard to add a new line.
+
+Make sure you indent two spaces, then add the following configuration:
+
+```bash
+privileged_without_host_devices = true
+```
+
+Press the `esc` key on your keyboard, then type `:wq` and press enter to save your changes and exit the file.
+
+Restart containerd with the following command:
+
+```bash
+chroot /host systemctl restart containerd
+```
+
+At this point, the debug session should be terminated, and you should be back in your shell.
+
+## Scenarios
+
+### Container Escape
+
+The [Container Escape to the Host System](https://madhuakula.com/kubernetes-goat/docs/scenarios/scenario-4/container-escape-to-the-host-system-in-kubernetes-containers/welcome) scenario illustrates what might happen if permissions that are not required are given to users. In this scenario, you can observe touchpoints that a privileged container might be able to use to impact the host system.
+
+### Non-Kata Demonstration
+
+We will only deploy the specific pod we need for this scenario. In this case, we will first deploy the pods corresponding to the container escape scenario:
+
+```bash
+kubectl apply -f scenarios/system-monitor
+```
+
+Make sure that the pod is up and running. You can do so using the following command:
+
+```bash
+kubectl get pods
+```
+
+Next, we can exec directly into the pod to run some tests.
+
+```bash
+POD_NAME=$(kubectl get pods -lapp=system-monitor -ojsonpath='{.items[0].metadata.name}')
+```
+
+Then exec into your pod:
+
+```bash
+kubectl exec -it $POD_NAME -- bash
+```
+
+To see the current capabilities of our pod, run the following command:
+
+```bash
+capsh --print
+```
+
+At a glance, you should be able to see many capabilities that you would associate with a privileged pod, such as `cap_sys_admin`.
+
+Also, running `mount` will display the mounted filesystems and their mount points. Take a second to look through the mounted host points. We should see some points that would bring up concerns; a line similar to `http://dev/sda3%20on%20etc/hostname%20type%20ext4%20(rw,relatime)`, for instance, would hint that the host's root filesystem (`/dev/sda`) is mounted at `/host` inside the container, a potential major security vulnerability.
+
+- You can further explore the mounted filesystem by navigating to the `/host-system/` path via `ls /host-system/`
+
+Using `chroot`, we can get direct access to host system privileges:
+
+```bash
+chroot /host-system bash
+```
+
+You should now see that you have access to host system resources by running
+
+```bash
+crictl pods
+```
+
+Once we are done here, let's move on to Kata pods. First, let's clean up this deployment. Exit the pods interactive terminal then run the following command:
+
+```bash
+kubectl delete -f scenarios/system-monitor
+```
+
+### Kata Demonstration
+
+Now we want to see if running the pod as a Kata pod brings about any differences.
+
+Let's head over to the deployment YAML, which should be located at `scenarios/system-monitor/deployment.yaml`.
+
+Open up the YAML in an editor of your choice.
+
+In the deployment template spec (after line 24), add a `runtimeClassName` with a value of `kata-mshv-vm-isolation` as illustrated in the YAML snippet below:
+
+```yaml
+spec:
+  selector:
+    matchLabels:
+      app: system-monitor
+  template:
+    metadata:
+      labels:
+        app: system-monitor
+    spec:
+      runtimeClassName: kata-mshv-vm-isolation # one line change to make this pod a Kata sandbox.
+```
+
+Let's deploy the updated manifest, and run the same tests as before:
+
+Deploy the manifest.
+
+```bash
+kubectl apply -f scenarios/system-monitor
+```
+
+After you've confirmed the pod is running, exec into it:
+
+```bash
+POD_NAME=$(kubectl get pods -lapp=system-monitor -ojsonpath='{.items[0].metadata.name}')
+kubectl exec -it $POD_NAME -- bash
+```
+
+Run the `capsh` command again and this time around, we should notice much less capabilities show up.
+
+```bash
+capsh --print
+```
+
+Run the `mount` command and again, we should see considerably less mounted resources than before.
+
+```bash
+mount
+```
+
+Let's attempt to get direct access to host system privileges again and see what host resources we have access to.
+
+We'll first run the `chroot` command again.
+
+```bash
+chroot /host-system bash
+```
+
+Next, run `crictl` again to view all pods running.
+
+```bash
+crictl pods
+```
+
+This time around, we should be greeted with an error stating that the file/directory does not exist. From the Kata pod, we won't have access to host resources.
+
+With Kata pods, we can see that we generally have less (or in some cases, no) access to resources that we previously had in a non-Kata pod!
+
+To clean up this demonstration, exit the interactive terminal session, then run the following command:
+
+```bash
+kubectl delete -f scenarios/system-monitor
+```
+
+## Exploring pod sandboxing under the hood
+
+As mentioned earlier, Pod Sandboxing runs each pods as a virtual machine on top of your node OS.
+
+Let's take a look under the hood to see how Kata pods are set up.
+
+For this section, let's deploy some sample pods. You can find sample folder for this section under the `docs/security/assets/pod-sandboxing-on-aks` in [AKS labs Github](https://github.com/Azure-Samples/aks-labs/tree/main/docs/security/assets/pod-sandboxing-on-aks/). Please download the folder and place it in the directory you are running the lab on.
+
+```bash
+kubectl apply -f ./kata_demo/
+```
+
+1. To list your nodes, use the kubectl get nodes command:
+
+```bash
+kubectl get nodes -o wide
+```
+
+2. Use the kubectl debug command to start a privileged container on your node and connect to it.
+
+```bash
+kubectl debug node/<node-name> -it --image=mcr.microsoft.com/cbl-mariner/busybox:2.0
+```
+
+In the debug pod, lets now navigate to host kernel and take a look at the Kata VMs:
+
+```bash
+chroot /host
+ps aux | grep cloud-hypervisor
+ps aux | grep containerd-shim-kata
+```
+
+Very interesting! We can see we have a [cloud hypervisor](https://techcommunity.microsoft.com/blog/appsonazureblog/preview-support-for-kata-vm-isolated-containers-on-aks-for-pod-sandboxing/3751557) running per Kata container within the host. In Pod Sandboxing, Cloud Hypervisor is the default hypervisor for Kata workloads. This differs from upstream Kata Containers, which uses QEMU as a default.
+
+Lets take a close look at the pods.
+
+```bash
+sudo crictl pods
+```
+
+We can see all our pods that are on the node. We are mainly interested in the Kata pods. Grab the pod ID for your `kata-1` pod, and run the command:
+
+```bash
+sudo crictl ps -a --pod <kata-pod-id>
+```
+
+This will provide you with the Kata container id. Lets inspect it further. Grab the container-id from the previous output, and run the command:
+
+```bash
+sudo crictl inspect <container-id> | grep -i runtime
+```
+
+We can see that the runtime is Kata based, unlike what you would expect from the normal pod deployments.
+
+## Protecting pods from one another
+
+All compute resources of sandboxed pods are isolated from one another, even if they are on the same node. This can allow you to more confidently bin-pack resources onto one node.
+
+To demonstrate this, we will use the same pods deployed from the previous section. We'll simulate a kernel panic in both a Kata and non-Kata pod, and observe the blast radius.
+
+### Kernel panic - sandboxed
+
+We will crash the sandboxed pod using the SysRq trigger, which simulates a kernel panic inside the sandbox:
+
+```bash
+kubectl exec -it kata-1 -- /bin/sh
+echo c > /proc/sysrq-trigger
+```
+
+Let's check if other pods are impacted from the kernel panic:
+
+```bash
+kubectl get pods
+```
+
+We can see that other pods are alive and well.
+
+### Kernel panic - normal
+
+We now repeat the same experiment on a normal pod:
+
+```bash
+kubectl exec -it normal-1 -- /bin/sh
+echo c > /proc/sysrq-trigger
+```
+
+Let's check if other pods are impacted from the kernel panic:
+
+```bash
+kubectl get pods
+```
+
+It seems like the whole node has been impacted from the panic.
+
+Pods running in a sandbox are isolated from others; the blast radius of an issue to the pod/workload should be contained within the bounds of it's own Kata VM. This makes pod sandboxing a great choice for multi-tenant and/or secure environments, where workloads need to be insulated from one another.
+
+## Summary
+
+🎉 Congratulations on completing this lab! You should now have some hands-on experience with **Pod Sandboxing** on AKS, with a solid understanding on differences between Kata and normal pods, and how the features of a Kata pod could help with isolating your workloads.
+
+### What we learned
+
+In this lab, you:
+
+- ✅ Set up Pod Sandboxing on AKS.
+- ✅ Deployed both sandboxed and non-sandboxed pods on a cluster.
+- ✅ Explored isolation provided by Pod Sandboxing.
+- ✅ Simulated workload stress scenarios, and saw how Pod Sandboxing can help isolate other workloads from the fallout.
+
+## Next steps
+
+This lab introduced **Pod Sandboxing** for compute isolation on AKS, but there are more concepts you can explore:
+
+- Other [isolation best practices](https://learn.microsoft.com/azure/aks/operator-best-practices-cluster-isolation) on AKS
+- Running a thoroughly [multi-tenant setup on AKS](https://learn.microsoft.com/azure/architecture/guide/multitenant/service/aks)
+
+## Cleanup (Optional)
+
+If you are finished with your AKS resources and no longer need them, you can simply delete the resource group to get rid of all components within.
+
+```bash
+az group delete --resource-group ${RG_NAME}
+```
