@@ -7,7 +7,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'App Service Labs',
   tagline: 'Learn Azure App Service by building with App Service',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/app-service-icon.svg',
 
   // Set the production url of your site here
   url: 'https://azure-samples.github.io',
@@ -57,7 +57,7 @@ const config: Config = {
         //   // Please change this to your repo.
         //   // Remove this to remove the "edit this page" links.
         //   editUrl:
-        //     'https://github.com/Azure-Samples/aks-labs/tree/main/',
+        //     'https://github.com/Azure-Samples/app-service-labs/tree/main/',
         //   // Useful options to enforce blogging best practices
         //   onInlineTags: 'warn',
         //   onInlineAuthors: 'warn',
@@ -89,13 +89,13 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
-    image: 'img/aks-labs-social-card.png',
+    // App Service Labs social card
+    image: 'img/app-service-labs-social-card.png',
     navbar: {
       title: 'App Service Labs',
       logo: {
         alt: 'App Service Labs Logo',
-        src: 'img/aks-logo-icon.svg',
+        src: 'img/app-service-icon.svg',
       },
       items: [
         {
@@ -103,6 +103,11 @@ const config: Config = {
           sidebarId: 'tutorialSidebar',
           position: 'left',
           label: 'Workshops',
+        },
+        {
+          href: 'https://azure.github.io/AppService/',
+          label: 'Blog',
+          position: 'left',
         },
         {
           href: 'https://github.com/Azure-Samples/app-service-labs',

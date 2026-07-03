@@ -7,25 +7,30 @@
 /* You can override the default Infima variables here. */
 :root {
 
-  --ifm-color-primary: #6a0dad;
-  --ifm-color-primary-dark: #5e099b;
-  --ifm-color-primary-darker: #54088c;
-  --ifm-color-primary-darkest: #4a077d;
-  --ifm-color-primary-light: #7b1eb8;
-  --ifm-color-primary-lighter: #8c2fc3;
-  --ifm-color-primary-lightest: #9d40ce;
+  --ifm-color-primary: #0078d4;
+  --ifm-color-primary-dark: #006cbf;
+  --ifm-color-primary-darker: #0066b4;
+  --ifm-color-primary-darkest: #005494;
+  --ifm-color-primary-light: #0d84e3;
+  --ifm-color-primary-lighter: #1b8ce6;
+  --ifm-color-primary-lightest: #3f9dec;
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(0, 120, 212, 0.1);
+
+  /* App Service accent (brand blue), used for highlighted text. */
+  --as-accent: #0078d4;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* For readability concerns, a slightly brighter blue is used in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #7d3fa9;
-  --ifm-color-primary-dark: #6f339b;
-  --ifm-color-primary-darker: #54088c;
-  --ifm-color-primary-darkest: #4a077d;
-  --ifm-color-primary-light: #7f29b9;
-  --ifm-color-primary-lighter: #9545c4;
-  --ifm-color-primary-lightest: #9f57c5;
-  --docusaurus-highlighted-code-line-bg: rgba(50, 33, 33, 0.3);
+  --ifm-color-primary: #3f9dec;
+  --ifm-color-primary-dark: #2790e9;
+  --ifm-color-primary-darker: #1b8ae8;
+  --ifm-color-primary-darkest: #0f76cc;
+  --ifm-color-primary-light: #57aaef;
+  --ifm-color-primary-lighter: #63b0f0;
+  --ifm-color-primary-lightest: #86c2f4;
+  --docusaurus-highlighted-code-line-bg: rgba(63, 157, 236, 0.15);
+
+  --as-accent: #5ea0ef;
 }

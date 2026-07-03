@@ -10,8 +10,8 @@
     margin-bottom: 2.5rem;
 }
 
-.purpletext {
-    color: #9e41cc;
+.accenttext {
+    color: var(--as-accent);
 }
 
 .logo {

@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
-	"name": "aks-labs-dev",
+	"name": "app-service-labs-dev",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
 	"features": {
@@ -20,7 +20,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ms-kubernetes-tools.vscode-aks-tools",
+				"ms-azuretools.vscode-azureappservice",
 				"ms-azuretools.vscode-azureresourcegroups",
 				"ms-azuretools.vscode-bicep",
 				"streetsidesoftware.code-spell-checker",
@@ -28,7 +28,6 @@
 				"GitHub.copilot-chat",
 				"ms-azuretools.vscode-azure-github-copilot",
 				"hashicorp.terraform",
-				"ms-kubernetes-tools.vscode-kubernetes-tools",
 				"esbenp.prettier-vscode",
 				"Gruntfuggly.todo-tree",
 				"unifiedjs.vscode-mdx"
