@@ -60,6 +60,7 @@ images, so these paths can be filled in after authoring.
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import PathPicker from '@site/src/components/PathPicker';
 
 # Host an MCP server on Azure App Service, secured with OAuth
 
@@ -128,9 +129,24 @@ The sample below follows this pattern: it creates a fresh MCP server per request
 
 ## The MCP server sample
 
+<PathPicker
+  description="Set these once - the sample code and every deployment step below follow your choice."
+  groups={[
+    { id: 'lang', label: 'Language', options: [
+      { value: 'node', label: 'Node.js' },
+      { value: 'python', label: 'Python' },
+    ]},
+    { id: 'deploy', label: 'Deploy with', options: [
+      { value: 'azd', label: 'azd' },
+      { value: 'az', label: 'az CLI' },
+      { value: 'portal', label: 'Portal' },
+    ]},
+  ]}
+/>
+
 The sample exposes one trivial tool (`roll_dice`) plus a `/health` endpoint for App Service health checks. Pick your language.
 
-<Tabs groupId="lang">
+<Tabs groupId="lang" queryString>
 <TabItem value="node" label="Node.js / TypeScript">
 
 Create a project with these files.
@@ -348,7 +364,7 @@ Python App Service apps run on **Linux** plans only. If you need Windows, use th
 
 Choose one deployment mechanism. All three create a Linux App Service on a low-cost **B1** plan with **Always On** enabled (streaming responses need a tier that supports Always On; avoid the Free F1 tier for MCP).
 
-<Tabs groupId="deploy">
+<Tabs groupId="deploy" queryString>
 <TabItem value="azd" label="Azure Developer CLI (azd)">
 
 The Azure Developer CLI provisions infrastructure and deploys code in one step. Add these files to your project.
