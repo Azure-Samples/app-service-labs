@@ -1,7 +1,4 @@
 .picker {
-  position: sticky;
-  top: calc(var(--ifm-navbar-height, 60px) + 0.5rem);
-  z-index: 2;
   margin: 0 0 1.5rem;
   padding: 1rem 1.25rem;
   border: 1px solid var(--ifm-color-emphasis-200);
@@ -94,10 +91,6 @@
 }
 
 @media (max-width: 768px) {
-  .picker {
-    position: static;
-  }
-
   .groups {
     gap: 0.85rem 1.5rem;
   }
