@@ -1,0 +1,12 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: kata-2
+spec:
+  runtimeClassName: kata-mshv-vm-isolation
+  containers:
+  - name: kata-2
+    image: mcr.microsoft.com/aks/fundamental/base-ubuntu:v0.0.11
+    command: ["/bin/sh", "-ec", "while :; do echo '.'; sleep 5 ; done"]
+    securityContext:
+      privileged: true

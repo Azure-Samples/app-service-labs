@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+  namespace: dev
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+    spec:
+      containers:
+        - name: product-service
+          image: ${ACR_NAME}.azurecr.io/product-service:1.5.2
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: team
+                    operator: In
+                    values:
+                      - dev
+      tolerations:
+        - key: "team"
+          operator: "Equal"
+          value: "dev"
+          effect: "NoSchedule"

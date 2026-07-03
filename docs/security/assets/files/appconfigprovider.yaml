@@ -1,0 +1,24 @@
+apiVersion: azconfig.io/v1
+kind: AzureAppConfigurationProvider
+metadata:
+  name: devconfigs
+spec:
+  endpoint: ${AC_ENDPOINT}
+  configuration:
+    refresh:
+      enabled: true
+      interval: 10s
+      monitoring:
+        keyValues:
+          - key: MyKey1
+  target:
+    configMapName: myconfigmap
+  auth:
+    workloadIdentity:
+      serviceAccountName: ${SA_NAME}
+  secret:
+    auth:
+      workloadIdentity:
+        serviceAccountName: ${SA_NAME}
+    target:
+      secretName: mysecret

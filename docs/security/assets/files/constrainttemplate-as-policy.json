@@ -1,0 +1,138 @@
+{
+  "properties": {
+    "policyType": "Custom",
+    "mode": "Microsoft.Kubernetes.Data",
+    "displayName": "Approved registries only",
+    "description": "This policy requires that all containers in a Kubernetes cluster are sourced from approved container registries.",
+    "policyRule": {
+      "if": {
+        "field": "type",
+        "in": [
+          "Microsoft.ContainerService/managedClusters"
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]",
+        "details": {
+          "templateInfo": {
+            "sourceType": "Base64Encoded",
+            "content": "YXBpVmVyc2lvbjogdGVtcGxhdGVzLmdhdGVrZWVwZXIuc2gvdjFiZXRhMQpraW5kOiBDb25zdHJhaW50VGVtcGxhdGUKbWV0YWRhdGE6CiAgbmFtZTogazhzcmVxdWlyZWRyZWdpc3RyeQpzcGVjOgogIGNyZDoKICAgIHNwZWM6CiAgICAgIG5hbWVzOgogICAgICAgIGtpbmQ6IEs4c1JlcXVpcmVkUmVnaXN0cnkKICAgICAgdmFsaWRhdGlvbjoKICAgICAgICBvcGVuQVBJVjNTY2hlbWE6CiAgICAgICAgICBwcm9wZXJ0aWVzOgogICAgICAgICAgICByZWdpc3RyeToKICAgICAgICAgICAgICB0eXBlOiBzdHJpbmcKICB0YXJnZXRzOgogICAgLSB0YXJnZXQ6IGFkbWlzc2lvbi5rOHMuZ2F0ZWtlZXBlci5zaAogICAgICByZWdvOiB8CiAgICAgICAgcGFja2FnZSBrOHNyZXF1aXJlZHJlZ2lzdHJ5CiAgICAgICAgdmlvbGF0aW9uW3sibXNnIjogbXNnLCAiZGV0YWlscyI6IHsiUmVnaXN0cnkgbXVzdCBiZSI6IHJlcXVpcmVkfX1dIHsKICAgICAgICAgIGlucHV0LnJldmlldy5vYmplY3Qua2luZCA9PSAiUG9kIgogICAgICAgICAgc29tZSBpCiAgICAgICAgICBpbWFnZSA6PSBpbnB1dC5yZXZpZXcub2JqZWN0LnNwZWMuY29udGFpbmVyc1tpXS5pbWFnZQogICAgICAgICAgcmVxdWlyZWQgOj0gaW5wdXQucGFyYW1ldGVycy5yZWdpc3RyeQogICAgICAgICAgbm90IHN0YXJ0c3dpdGgoaW1hZ2UscmVxdWlyZWQpCiAgICAgICAgICBtc2cgOj0gc3ByaW50ZigiRm9yYmlkZGVuIHJlZ2lzdHJ5OiAldiIsIFtpbWFnZV0pCiAgICAgICAgfQo="
+          },
+          "apiGroups": [
+            ""
+          ],
+          "kinds": [
+            "Pod"
+          ],
+          "namespaces": "[parameters('namespaces')]",
+          "excludedNamespaces": "[parameters('excludedNamespaces')]",
+          "labelSelector": "[parameters('labelSelector')]",
+          "values": {
+            "registry": "[parameters('registry')]"
+          }
+        }
+      }
+    },
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Effect",
+          "description": "'audit' allows a non-compliant resource to be created or updated, but flags it as non-compliant. 'deny' blocks the non-compliant resource creation or update. 'disabled' turns off the policy."
+        },
+        "allowedValues": [
+          "audit",
+          "deny",
+          "disabled"
+        ],
+        "defaultValue": "audit"
+      },
+      "excludedNamespaces": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Namespace exclusions",
+          "description": "List of Kubernetes namespaces to exclude from policy evaluation."
+        },
+        "defaultValue": [
+          "kube-system",
+          "gatekeeper-system",
+          "azure-arc"
+        ]
+      },
+      "namespaces": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Namespace inclusions",
+          "description": "List of Kubernetes namespaces to only include in policy evaluation. An empty list means the policy is applied to all resources in all namespaces."
+        },
+        "defaultValue": []
+      },
+      "labelSelector": {
+        "type": "Object",
+        "metadata": {
+          "displayName": "Kubernetes label selector",
+          "description": "Label query to select Kubernetes resources for policy evaluation. An empty label selector matches all Kubernetes resources."
+        },
+        "defaultValue": {},
+        "schema": {
+          "description": "A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all resources.",
+          "type": "object",
+          "properties": {
+            "matchLabels": {
+              "description": "matchLabels is a map of {key,value} pairs.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "minProperties": 1
+            },
+            "matchExpressions": {
+              "description": "matchExpressions is a list of values, a key, and an operator.",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "description": "key is the label key that the selector applies to.",
+                    "type": "string"
+                  },
+                  "operator": {
+                    "description": "operator represents a key's relationship to a set of values.",
+                    "type": "string",
+                    "enum": [
+                      "In",
+                      "NotIn",
+                      "Exists",
+                      "DoesNotExist"
+                    ]
+                  },
+                  "values": {
+                    "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "key",
+                  "operator"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "registry": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Image registry",
+          "description": "The container image registry to allow."
+        }
+      }
+    }
+  }
+}
