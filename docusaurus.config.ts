@@ -7,7 +7,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'App Service Labs',
   tagline: 'Learn Azure App Service by building with App Service',
-  favicon: 'img/app-service-icon.svg',
+  favicon: 'img/app-service-labs-icon.svg',
 
   // Set the production url of your site here
   url: 'https://azure-samples.github.io',
@@ -95,7 +95,7 @@ const config: Config = {
       title: 'App Service Labs',
       logo: {
         alt: 'App Service Labs Logo',
-        src: 'img/app-service-icon.svg',
+        src: 'img/app-service-labs-icon.svg',
       },
       items: [
         {
