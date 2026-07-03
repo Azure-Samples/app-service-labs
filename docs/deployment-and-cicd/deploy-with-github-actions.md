@@ -3,45 +3,6 @@ title: Deploy to App Service with GitHub Actions
 sidebar_position: 2
 ---
 
-{/*
-SCREENSHOT MANIFEST - capture the following and save under
-static/img/labs/deploy-with-github-actions/. Lightweight placeholder PNGs are
-committed so the build passes; replace them with real captures later. All images
-are referenced as /img/labs/deploy-with-github-actions/<name>.png
-
-1. deployment-center-github.png
-   URL/blade: App Service -> Deployment -> Deployment Center -> Source = GitHub
-   Capture: Deployment Center with Source set to GitHub, an Organization,
-   Repository, and Branch selected, and Authentication type set to
-   "User-assigned managed identity" (the keyless option), before selecting Save.
-
-2. deployment-center-logs.png
-   URL/blade: App Service -> Deployment -> Deployment Center -> Logs tab
-   Capture: the Logs tab showing a successful (green) deployment triggered by a
-   GitHub Actions run, with the commit and status visible.
-
-3. github-actions-run.png
-   URL/blade: GitHub repo -> Actions tab -> the workflow run
-   Capture: a completed workflow run showing the build and deploy jobs green,
-   with the "Deploy to Azure Web App" step expanded.
-
-4. github-actions-oidc-login.png
-   URL/blade: GitHub repo -> Actions -> workflow run -> Azure Login step
-   Capture: the expanded "Azure Login" (azure/login@v2) step log showing a
-   successful federated (OIDC) sign-in with no secret in the output.
-
-5. github-repo-secrets.png
-   URL/blade: GitHub repo -> Settings -> Secrets and variables -> Actions
-   Capture: the repository secrets list showing AZURE_CLIENT_ID,
-   AZURE_TENANT_ID, and AZURE_SUBSCRIPTION_ID (values hidden). No publish
-   profile or client secret is present.
-
-6. app-running.png
-   URL/blade: the running app in a browser tab
-   Capture: the deployed app at *.azurewebsites.net returning its page after the
-   GitHub Actions deployment completes.
-*/}
-
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import PathPicker from '@site/src/components/PathPicker';
@@ -375,19 +336,11 @@ In the [Azure portal](https://portal.azure.com), open your web app, then select 
 1. Under **Authentication type**, select **User-assigned managed identity** - the keyless (OIDC) option.
 1. Select **Save**.
 
-![Deployment Center configured for GitHub with user-assigned managed identity](/img/labs/deploy-with-github-actions/deployment-center-github.png)
-
-{/* Capture: Deployment Center with Source=GitHub, org/repo/branch selected, Authentication type=User-assigned managed identity, before Save. */}
-
 Deployment Center commits a workflow file to `.github/workflows/` in your repository, creates the federated credential, and adds the identity IDs as repository secrets - all without a publish profile.
 
 ### 3. Watch the first run
 
 Saving triggers the first workflow run. Watch it on the **Logs** tab of Deployment Center, or on the **Actions** tab of your GitHub repository.
-
-![Deployment Center Logs tab showing a successful GitHub Actions deployment](/img/labs/deploy-with-github-actions/deployment-center-logs.png)
-
-{/* Capture: Deployment Center Logs tab with a green deployment from a GitHub Actions run. */}
 
 :::tip Portal generates the workflow
 The generated workflow uses `azure/webapps-deploy` with OIDC login. You can edit it in your repository to add build steps or change triggers, just like the hand-authored versions in the next section.
@@ -714,15 +667,7 @@ git commit -m "Add GitHub Actions deployment workflow"
 git push
 ```
 
-![GitHub Actions workflow run with build and deploy jobs green](/img/labs/deploy-with-github-actions/github-actions-run.png)
-
-{/* Capture: completed workflow run in the Actions tab with build and deploy jobs green and the Deploy step expanded. */}
-
 The **Azure Login** step signs in with the OIDC token - notice there's no secret in the log, only the federated exchange.
-
-![Azure Login step showing a successful OIDC federated sign-in](/img/labs/deploy-with-github-actions/github-actions-oidc-login.png)
-
-{/* Capture: expanded azure/login@v2 step showing successful federated sign-in with no secret. */}
 
 ## Verify your deployment
 
@@ -739,15 +684,7 @@ HTTP/1.1 200 OK
 Content-Type: text/html
 ```
 
-![The running app in the browser after the GitHub Actions deployment](/img/labs/deploy-with-github-actions/app-running.png)
-
-{/* Capture: the deployed app at *.azurewebsites.net returning its page. */}
-
 You can confirm no secrets are stored: in your repository, go to **Settings** > **Secrets and variables** > **Actions**. You should see only `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID` - no publish profile and no client secret.
-
-![Repository secrets showing only the three Azure IDs](/img/labs/deploy-with-github-actions/github-repo-secrets.png)
-
-{/* Capture: Actions secrets list with the three AZURE_ IDs and no publish profile or client secret. */}
 
 :::tip First request can be slow
 The first request after a deployment may take a few seconds while the app starts. If you see a "starting" or `503` page, wait a moment and refresh.
