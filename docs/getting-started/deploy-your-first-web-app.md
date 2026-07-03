@@ -54,6 +54,7 @@ All images are referenced as /img/labs/deploy-your-first-web-app/<name>.png
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import PathPicker from '@site/src/components/PathPicker';
 import Prerequisites from '@site/src/components/SharedMarkdown/_prerequisites.mdx';
 
 # Deploy your first web app
@@ -90,6 +91,28 @@ This lab uses the **East US** region and the **B1 (Basic)** pricing tier, a low-
 :::
 
 ## Deploy the app
+
+<PathPicker
+  description="Set these once - every matching step and code sample below follows your choice."
+  groups={[
+    { id: 'tooling', label: 'Tooling', options: [
+      { value: 'azd', label: 'azd' },
+      { value: 'az', label: 'az CLI' },
+      { value: 'portal', label: 'Portal' },
+    ]},
+    { id: 'language', label: 'Language', options: [
+      { value: 'dotnet', label: '.NET' },
+      { value: 'node', label: 'Node.js' },
+      { value: 'python', label: 'Python' },
+      { value: 'java', label: 'Java' },
+      { value: 'php', label: 'PHP' },
+    ]},
+    { id: 'os', label: 'OS', options: [
+      { value: 'linux', label: 'Linux' },
+      { value: 'windows', label: 'Windows' },
+    ]},
+  ]}
+/>
 
 Pick a deployment mechanism, then choose your language. The steps produce an identical running app.
 
