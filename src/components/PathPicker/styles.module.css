@@ -1,0 +1,104 @@
+.picker {
+  position: sticky;
+  top: calc(var(--ifm-navbar-height, 60px) + 0.5rem);
+  z-index: 2;
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: var(--ifm-global-radius, 8px);
+  background: var(--ifm-background-surface-color, var(--ifm-background-color));
+  box-shadow: var(--ifm-global-shadow-lw);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.icon {
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.title {
+  font-size: 1rem;
+}
+
+.description {
+  margin-top: 0.15rem;
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.groupLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.options {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.2rem;
+  border-radius: var(--ifm-global-radius, 8px);
+  background: var(--ifm-color-emphasis-100);
+}
+
+.option {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: calc(var(--ifm-global-radius, 8px) - 2px);
+  background: transparent;
+  color: var(--ifm-color-emphasis-800);
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background var(--ifm-transition-fast, 200ms),
+    color var(--ifm-transition-fast, 200ms),
+    border-color var(--ifm-transition-fast, 200ms);
+}
+
+.option:hover {
+  color: var(--ifm-color-primary);
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 1px;
+}
+
+.optionActive,
+.optionActive:hover {
+  background: var(--ifm-background-surface-color, var(--ifm-background-color));
+  border-color: var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-primary);
+  box-shadow: var(--ifm-global-shadow-lw);
+}
+
+@media (max-width: 768px) {
+  .picker {
+    position: static;
+  }
+
+  .groups {
+    gap: 0.85rem 1.5rem;
+  }
+}
