@@ -38,8 +38,8 @@ import Cleanup from "../../src/components/SharedMarkdown/_cleanup.mdx";
 ```mdx
 <Prerequisites
   tools={[
-    { name: "Helm", url: "https://helm.sh/docs/intro/install/" },
-    { name: "Kustomize", url: "https://kubectl.docs.kubernetes.io/installation/kustomize/" },
+    { name: "Azure CLI", url: "https://learn.microsoft.com/cli/azure/install-azure-cli" },
+    { name: "Visual Studio Code", url: "https://code.visualstudio.com/download" },
   ]}
 />
 

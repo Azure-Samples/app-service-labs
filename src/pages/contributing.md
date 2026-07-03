@@ -1,4 +1,4 @@
-# Contributing to AKS Labs
+# Contributing to App Service Labs
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
@@ -53,13 +53,13 @@ chances of your issue being dealt with quickly:
 - **Suggest a Fix** - if you can't fix the bug yourself, perhaps you can point to what might be
   causing the problem (line of code or commit)
 
-You can file new issues by providing the above information at the corresponding repository's issues link: [https://github.com/Azure-Samples/aks-labs/issues/new](https://github.com/Azure-Samples/aks-labs/issues/new).
+You can file new issues by providing the above information at the corresponding repository's issues link: [https://github.com/Azure-Samples/app-service-labs/issues/new](https://github.com/Azure-Samples/app-service-labs/issues/new).
 
 ### Submitting a Pull Request (PR) {#submit-pr}
 
 Before you submit your Pull Request (PR) consider the following guidelines:
 
-- Search the repository [https://github.com/Azure-Samples/aks-labs/pulls](https://github.com/Azure-Samples/aks-labs/pulls) for an open or closed PR
+- Search the repository [https://github.com/Azure-Samples/app-service-labs/pulls](https://github.com/Azure-Samples/app-service-labs/pulls) for an open or closed PR
   that relates to your submission. You don't want to duplicate effort.
 - Fork the repository and make your changes in your local fork.
 - Commit your changes using a descriptive commit message
@@ -83,18 +83,18 @@ When putting together your workshop, each workshop should be self-contained and 
 
 Before creating content, check if your topic is already covered in Microsoft Learn. We are not trying to duplicate the content that is already available on [Microsoft Learn](https://learn.microsoft.com/training/browse/), so please check there first. If you find that your workshop is similar to existing content, please consider submitting a PR to update the existing content there instead of creating a new workshop here.
 
-Consider focusing on scenarios beyond core AKS features, as these are already well-documented in the [official AKS documentation](https://learn.microsoft.com/azure/aks/). We particularly value end-to-end integration examples that demonstrate how to connect AKS with other Azure services - scenarios that might not be thoroughly covered elsewhere. For example, workshops showing how to integrate AKS with:
+Consider focusing on scenarios beyond the basics that are already well-documented in the [official App Service documentation](https://learn.microsoft.com/azure/app-service/). We particularly value end-to-end integration examples that demonstrate how to connect Azure App Service with other Azure services - scenarios that might not be thoroughly covered elsewhere. For example, workshops showing how to integrate App Service with:
 
 - Azure Functions
 - Azure Logic Apps
 - Azure DevOps
 - other Azure services
 
-You could also explore how to use AKS with other open-source tools like:
+You could also explore how to use App Service with popular frameworks and tools like:
 
-- Helm
-- Istio
-- ArgoCD
+- .NET, Node.js, Python, and Java
+- GitHub Actions
+- Containers and Docker
 
 The possibilities are endless!
 
@@ -112,7 +112,7 @@ This site is built using [Docusaurus](https://docusaurus.io/) and uses its defau
 
 ### Naming Files {#naming-files}
 
-For new workshops, create a markdown file in the relevant category folder within the `docs` directory. Workshops are organized by high-level categories - select the most appropriate one for your content (or reach out with questions about placement). Name your file using lowercase letters with hyphens between words. For instance, a workshop about AKS application deployment might be named `deploying-an-application-to-aks.md` within the `getting-started` subdirectory.
+For new workshops, create a markdown file in the relevant category folder within the `docs` directory. Workshops are organized by high-level categories - select the most appropriate one for your content (or reach out with questions about placement). Name your file using lowercase letters with hyphens between words. For instance, a workshop about deploying an application to App Service might be named `deploying-an-application-to-app-service.md` within the `getting-started` subdirectory.
 
 ### Writing Content {#writing-content}
 
@@ -170,7 +170,6 @@ To maintain consistency across workshops and reduce duplication, this project pr
 
 - **`_prerequisites.mdx`** - Provides a standard prerequisites section with common tools and Azure CLI setup
 - **`_provision_resource_group.mdx`** - Creates environment variables and resource group setup
-- **`_provision_aks_cluster.mdx`** - Standard AKS cluster creation commands
 - **`_provision_resources.mdx`** - Additional resource provisioning steps
 - **`_cleanup.mdx`** - Standard cleanup instructions for removing workshop resources
 
@@ -203,12 +202,12 @@ The **Prerequisites** component accepts optional `tools` props to include additi
 <Prerequisites
   tools={[
     {
-      name: "Helm",
-      url: "https://helm.sh/docs/intro/install/",
+      name: "Azure CLI",
+      url: "https://learn.microsoft.com/cli/azure/install-azure-cli",
     },
     {
-      name: "Kustomize",
-      url: "https://kubectl.docs.kubernetes.io/installation/kustomize/",
+      name: "Visual Studio Code",
+      url: "https://code.visualstudio.com/download",
     }
   ]}
 />
@@ -269,7 +268,7 @@ You may also want to have others test your workshop prior to submitting a PR. To
 1. Click on the **Deploy to GitHub Pages** in the left navigation
 1. Click the **Run workflow** button. This will trigger the workflow to build and deploy your changes to GitHub Pages.
 
-Once the workflow has completed, you can access your site at `https://<your-github-username>.github.io/aks-labs/`.
+Once the workflow has completed, you can access your site at `https://<your-github-username>.github.io/app-service-labs/`.
 
 :::warning
 

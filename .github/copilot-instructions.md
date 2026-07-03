@@ -1,4 +1,4 @@
-# AKS Labs - GitHub Copilot Instructions
+# App Service Labs - GitHub Copilot Instructions
 
 > Scope: Repository-wide standards and writing guidance for hands-on labs, workshops, and teaching content.
 > Module-specific guidance may appear in subfolders (for example, README files under docs/).
@@ -10,7 +10,7 @@
 
 ### Repository overview
 
-This repo hosts a Docusaurus site with hands-on AKS labs and workshop content. Content lives in docs/, blog/, and pages, with supporting assets under docs/\*\*/assets/.
+This repo hosts a Docusaurus site with hands-on Azure App Service labs and workshop content. Content lives in docs/, blog/, and pages, with supporting assets under docs/\*\*/assets/.
 
 ### Primary content types
 
@@ -42,12 +42,12 @@ This repo hosts a Docusaurus site with hands-on AKS labs and workshop content. C
 | Type            | Convention                             | Example                      |
 | :-------------- | :------------------------------------- | :--------------------------- |
 | Markdown        | kebab-case.md                          | getting-started.md           |
-| MDX             | kebab-case.mdx                         | aks-automatic.mdx            |
+| MDX             | kebab-case.mdx                         | deploy-web-app.mdx           |
 | React component | PascalCase.tsx                         | LandingPage.tsx              |
 | TS utility      | camelCase.ts                           | analytics.ts                 |
 | CSS             | kebab-case.css or Component.module.css | custom.css, Index.module.css |
 | YAML            | kebab-case.yaml or .yml                | deployment.yaml              |
-| Shell scripts   | kebab-case.sh                          | setup-cluster.sh             |
+| Shell scripts   | kebab-case.sh                          | provision-app.sh             |
 
 ### Code style
 
@@ -56,7 +56,7 @@ This repo hosts a Docusaurus site with hands-on AKS labs and workshop content. C
 - Shell: bash with set -euo pipefail; add prerequisite checks.
 - TypeScript: ESLint defaults; functional React components with hooks.
 - Code samples: Use fenced code blocks with triple backticks and a language identifier, such as bash, python, or typescript.
-- Inline code: Use single backticks only for code terms embedded in normal sentences (for example, `kubectl`).
+- Inline code: Use single backticks only for code terms embedded in normal sentences (for example, `az webapp up`).
 
 ### Links and images
 
@@ -65,18 +65,18 @@ This repo hosts a Docusaurus site with hands-on AKS labs and workshop content. C
 - Provide alt text for all images.
 - Store images under the nearest docs/\*\*/assets/ folder.
 
-### Kubernetes and Azure examples
+### Azure and App Service examples
 
-- Never use :latest images.
-- Always include resource requests and limits in manifests.
-- Include labels and namespaces where relevant.
-- Avoid embedding secrets; use placeholders and Key Vault references.
+- Pin container images to a specific tag or digest; never use :latest.
+- Choose an appropriate App Service plan tier for the workload and note cost implications.
+- Prefer managed identity over stored credentials when accessing Azure services.
+- Avoid embedding secrets; use placeholders, app settings, and Key Vault references.
 
 ### Security and privacy
 
 - Never commit secrets, tokens, or credentials.
 - Avoid customer-specific data or personal email addresses.
-- Use generic sample values (example-resource-group, example-cluster).
+- Use generic sample values (example-resource-group, example-webapp).
 
 ### Build and development
 
@@ -142,10 +142,10 @@ This is a Docusaurus site. Typical commands:
 
 ## Part 3: Terminology reminders
 
-- Azure Kubernetes Service (AKS) on first mention, then AKS.
-- kubectl and kubeconfig are lowercase.
-- Cluster, node, pod, and namespace are lowercase as common nouns.
-- Deployment, Service, and Ingress are capitalized when referring to resource types.
+- Azure App Service on first mention, then App Service.
+- az and azd commands are lowercase.
+- Web app, App Service plan, and deployment slot are lowercase as common nouns.
+- App Service Environment (ASE) is capitalized when referring to the resource type.
 
 ---
 
@@ -212,143 +212,48 @@ The Microsoft voice is **simple and human**. Our voice hinges on crisp simplicit
 **software as a service (SaaS)**: Don't capitalize as _SAAS_. Don't hyphenate as a modifier.
 **third-party**: Hyphenate as an adjective. Two words as a noun (_third party_).
 
-### Kubernetes Terms
+### Azure App Service Terms
 
 #### Core Concepts
 
-**cluster**: Lowercase. A set of nodes that run containerized applications managed by Kubernetes.
-**node**: Lowercase. A worker machine in Kubernetes (physical or virtual).
-**pod**: Lowercase. The smallest deployable unit in Kubernetes, containing one or more containers.
-**container**: Lowercase. A lightweight, standalone executable package that includes everything needed to run an application.
-**namespace**: Lowercase. A way to divide cluster resources between multiple users or projects.
-**workload**: Lowercase. An application running on Kubernetes.
-**object**: Lowercase. An entity in the Kubernetes system representing cluster state (e.g., Pod, Service, Deployment).
-**spec**: Lowercase. Defines how each object should be configured and its desired state.
-**status**: Lowercase. The current state of a Kubernetes object, managed by the system.
-**name**: Lowercase. A client-provided string that uniquely identifies an object within a namespace.
-**UID**: Uppercase. A Kubernetes-generated string to uniquely identify objects across the cluster.
-**API group**: Lowercase. A set of related paths in the Kubernetes API.
-**API server, kube-apiserver**: Lowercase. The control plane component that exposes the Kubernetes API.
+**Azure App Service**: Spell out on first mention, then use _App Service_.
+**web app**: Lowercase. An app hosted on App Service that serves HTTP(S) traffic.
+**App Service plan**: Capitalize _App Service_. Defines the region, instance size, and scale count that host your apps.
+**App Service Environment (ASE)**: Spell out on first mention, then _ASE_. A fully isolated, dedicated environment for running App Service apps at high scale.
+**runtime stack**: Lowercase. The language runtime an app runs on (for example, .NET, Node.js, Python, Java, or PHP).
+**deployment slot**: Lowercase. A live app with its own hostname used for staging and zero-downtime swaps.
+**slot swap**: Lowercase. Swapping the content and configuration of two deployment slots.
+**custom domain**: Lowercase. A domain name you map to your app instead of the default `*.azurewebsites.net` hostname.
+**app setting**: Lowercase. A key-value configuration value exposed to the app as an environment variable.
+**connection string**: Lowercase. A configuration value used to connect the app to a backing service.
 
-#### Workload Resources
+#### Scaling and Networking
 
-**Deployment**: Capitalize when referring to the Kubernetes resource type. Manages a replicated application.
-**ReplicaSet**: One word, capitalize. Ensures a specified number of pod replicas are running.
-**StatefulSet**: One word, capitalize. Manages stateful applications with stable network identifiers.
-**DaemonSet**: One word, capitalize. Ensures all (or some) nodes run a copy of a pod.
-**Job**: Capitalize when referring to the Kubernetes resource. Creates one or more pods and ensures successful completion.
-**CronJob**: One word, capitalize. Creates Jobs on a repeating schedule.
-**replica**: Lowercase. A copy or duplicate of a pod for high availability and scalability.
-**init container**: Lowercase. One or more initialization containers that must run to completion before app containers start.
-**sidecar container**: Lowercase. One or more containers typically started before app containers to provide supporting features.
-**ephemeral container**: Lowercase. A temporary container type for debugging running pods.
+**scale up**: Lowercase. Move to a larger pricing tier / instance size (vertical scaling).
+**scale out**: Lowercase. Add more instances of the app (horizontal scaling).
+**autoscale**: One word, lowercase. Automatically adjust instance count based on rules or metrics.
+**VNet integration**: Capitalize _VNet_. Lets an app make outbound calls into an Azure virtual network.
+**private endpoint**: Lowercase. A network interface that connects privately to your app.
+**access restrictions**: Lowercase. Rules that allow or deny inbound traffic by IP or service tag.
+**hybrid connection**: Lowercase. Provides access to on-premises resources from an app.
 
-#### Service and Networking
+#### Deployment and Operations
 
-**Service**: Capitalize when referring to the Kubernetes resource type. An abstract way to expose an application running on pods.
-**Ingress**: Capitalize. Manages external access to services, typically HTTP.
-**Ingress controller**: _Ingress_ capitalized, _controller_ lowercase. A component that implements Ingress rules.
-**load balancer**: Lowercase. Distributes network traffic across multiple servers.
-**ClusterIP**: One word, capitalize. Default service type, exposes service on internal cluster IP.
-**NodePort**: One word, capitalize. Exposes service on each node's IP at a static port.
-**LoadBalancer**: One word, capitalize when referring to the Kubernetes service type.
-**NetworkPolicy**: One word, capitalize. Specifies how pods are allowed to communicate with each other and other network endpoints.
-**EndpointSlice**: One word, capitalize. A scalable way to track network endpoints for a Service.
-**Gateway API**: Capitalize both words. A family of API kinds for modeling service networking.
-**DNS**: Uppercase. Cluster-wide DNS resolution for services and pods.
-**CNI (Container Network Interface)**: Spell out on first mention. The standard for network plugins in Kubernetes.
-
-#### Configuration and Storage
-
-**ConfigMap**: One word, capitalize. Stores non-confidential configuration data as key-value pairs.
-**Secret**: Capitalize when referring to the Kubernetes resource. Stores sensitive information like passwords and tokens.
-**PersistentVolume (PV)**: One word, capitalize. A piece of storage in the cluster provisioned by an administrator.
-**PersistentVolumeClaim (PVC)**: One word, capitalize. A request for storage by a user.
-**StorageClass**: One word, capitalize. Describes the "classes" of storage available.
-**Volume**: Capitalize when referring to the Kubernetes resource. A directory containing data accessible to containers in a pod.
-**CSI (Container Storage Interface)**: Spell out on first mention. The standard for storage plugins in Kubernetes.
-**emptyDir**: One word, camelCase. A temporary volume that shares a pod's lifetime.
-**hostPath**: One word, camelCase. Mounts a file or directory from the host node's filesystem.
-**container environment variables**: Lowercase. Name-value pairs providing configuration to containers.
-
-#### Azure Kubernetes Service (AKS)
-
-**Azure Kubernetes Service (AKS)**: Spell out on first mention, then use _AKS_. Don't use _Azure Container Service_.
-**node pool**: Two words, lowercase. A group of nodes with the same configuration in AKS.
-**system node pool**: Lowercase. Hosts critical system pods.
-**user node pool**: Lowercase. Hosts application workloads.
-**virtual nodes**: Lowercase. Enable scaling with Azure Container Instances.
-**managed identity**: Lowercase. Azure-managed credentials for AKS clusters.
-**Azure CNI**: Capitalize _Azure_, uppercase _CNI_. Azure's container network interface implementation.
-**kubenet**: Lowercase. Basic network plugin that creates a bridge and allocates IP addresses.
-**KEDA (Kubernetes Event-driven Autoscaling)**: Spell out on first mention. Event-driven pod autoscaling for AKS.
-**cluster autoscaler**: Lowercase. Automatically adjusts node pool size based on demand.
-**Horizontal Pod Autoscaler (HPA)**: Capitalize resource name. Scales pod replicas based on metrics.
-**Vertical Pod Autoscaler (VPA)**: Capitalize resource name. Adjusts resource requests and limits for containers.
-**Azure Policy for AKS**: Capitalize _Azure Policy_. Enforces governance policies on AKS clusters.
-**Azure Monitor for containers**: Capitalize _Azure Monitor_. Monitoring solution for AKS clusters.
-**Microsoft Defender for Containers**: Capitalize. Security solution for containerized environments.
+**continuous deployment (CD)**: Lowercase. Automatically deploying code changes, typically from GitHub Actions or Azure Pipelines.
+**Kudu**: Capitalize. The engine behind Git deployments and many App Service management features.
+**SCM site**: Uppercase _SCM_. The advanced tools (Kudu) site at `*.scm.azurewebsites.net`.
+**Run From Package**: Capitalize. Running an app directly from a mounted package file.
+**Always On**: Capitalize both words. A setting that keeps the app loaded to avoid cold starts.
+**diagnostic settings**: Lowercase. Configuration that routes logs and metrics to a destination.
+**App Service logs**: Capitalize _App Service_. Application and web server logs for an app.
+**health check**: Lowercase. A path App Service pings to determine instance health.
+**managed identity**: Lowercase. Azure-managed credentials an app uses to access Azure services securely.
 
 #### Tools and Commands
 
-**kubectl**: Lowercase. The Kubernetes command-line tool. Pronounced "kube control" or "kube C-T-L".
-**Helm**: Capitalize. A package manager for Kubernetes.
-**Helm chart**: _Helm_ capitalized, _chart_ lowercase. A collection of files describing Kubernetes resources.
-**kubeconfig**: Lowercase. Configuration file for kubectl to access clusters.
-**Kustomize**: Capitalize. A tool for customizing Kubernetes configurations.
-**k9s**: Lowercase. A terminal-based UI for managing Kubernetes clusters.
-**Azure CLI, az**: Capitalize _Azure CLI_. Lowercase _az_ command. Azure command-line interface for AKS management.
-
-#### Other Kubernetes Terms
-
-**control plane**: Two words, lowercase. The container orchestration layer that manages the cluster.
-**kubelet**: Lowercase. An agent that runs on each node ensuring containers are running in a pod.
-**kube-proxy**: Lowercase, hyphenated. Network proxy that runs on each node.
-**etcd**: Lowercase. Consistent and highly available key-value store for cluster data.
-**container runtime**: Lowercase. Software responsible for running containers (e.g., containerd).
-**manifest**: Lowercase. A YAML or JSON file that defines Kubernetes resources.
-**label**: Lowercase. Key-value pairs attached to objects for identification.
-**annotation**: Lowercase. Key-value pairs for attaching non-identifying metadata.
-**selector**: Lowercase. Used to filter resources based on labels.
-**rolling update**: Lowercase. A deployment strategy that gradually replaces pod instances.
-**liveness probe, readiness probe, startup probe**: Lowercase. Diagnostic checks that kubelet performs on containers.
-**kube-controller-manager**: Lowercase, hyphenated. Control plane component that runs controller processes.
-**kube-scheduler**: Lowercase, hyphenated. Control plane component that assigns pods to nodes.
-**cloud-controller-manager**: Lowercase, hyphenated. Control plane component that integrates with cloud providers.
-**controller**: Lowercase. A control loop that watches cluster state and makes changes to move toward desired state.
-**CustomResourceDefinition (CRD)**: One word, capitalize. Defines a new custom API to extend Kubernetes.
-**custom resource**: Lowercase. An extension of the Kubernetes API defined by a CRD.
-**Operator**: Capitalize. A method of packaging, deploying, and managing a Kubernetes application using custom resources.
-**ServiceAccount**: One word, capitalize. Provides an identity for processes running in a pod.
-**RBAC (Role-Based Access Control)**: Spell out on first mention. Manages authorization through the Kubernetes API.
-**Role, ClusterRole**: Capitalize. Define permissions within a namespace (Role) or cluster-wide (ClusterRole).
-**RoleBinding, ClusterRoleBinding**: One word, capitalize. Grant permissions defined in a Role or ClusterRole.
-**taint**: Lowercase. Prevents pods from being scheduled on a node unless they tolerate the taint.
-**toleration**: Lowercase. Allows a pod to be scheduled on a node with a matching taint.
-**affinity**: Lowercase. Rules that give hints to the scheduler about where to place pods.
-**node affinity**: Lowercase. Constrains which nodes a pod can be scheduled on based on node labels.
-**pod affinity, pod anti-affinity**: Lowercase. Constrains pod placement based on labels of other pods.
-**PodDisruptionBudget (PDB)**: One word, capitalize. Limits the number of pods that can be down simultaneously.
-**ResourceQuota**: One word, capitalize. Constrains aggregate resource consumption per namespace.
-**LimitRange**: One word, capitalize. Constrains resource consumption per container or pod in a namespace.
-**QoS class (Quality of Service class)**: Lowercase _class_. Classifies pods for scheduling and eviction decisions (Guaranteed, Burstable, BestEffort).
-**finalizer**: Lowercase. A namespaced key that delays deletion until specific conditions are met.
-**garbage collection**: Lowercase. Mechanisms Kubernetes uses to clean up cluster resources.
-**drain**: Lowercase. The process of safely evicting pods from a node for maintenance.
-**cordon**: Lowercase. Marks a node as unschedulable without evicting existing pods.
-**eviction**: Lowercase. The process of terminating pods on a node.
-**preemption**: Lowercase. Terminating lower-priority pods to make room for higher-priority pods.
-**priority class**: Lowercase. Defines the priority of a pod relative to other pods.
-**static pod**: Lowercase. A pod managed directly by the kubelet on a specific node.
-**mirror pod**: Lowercase. A pod object representing a static pod in the API server.
-**event**: Lowercase. A Kubernetes object describing state changes or notable occurrences.
-**feature gate**: Lowercase. A set of keys to control which Kubernetes features are enabled.
-**containerd**: Lowercase. An industry-standard container runtime.
-**CRI-O**: Uppercase CRI, uppercase O. A lightweight container runtime for Kubernetes.
-**cgroup (control group)**: Lowercase. A Linux kernel feature for resource isolation and limits.
-**Pod lifecycle**: _Pod_ capitalized. The sequence of states a pod passes through during its lifetime.
-**image**: Lowercase. A stored instance of a container holding software needed to run an application.
-**image pull policy**: Lowercase. Determines when the kubelet pulls a container image (Always, IfNotPresent, Never).
+**Azure CLI, az**: Capitalize _Azure CLI_. Lowercase _az_ command. The Azure command-line interface.
+**Azure portal**: Capitalize _Azure_, lowercase _portal_.
+**Azure Developer CLI, azd**: Capitalize _Azure Developer CLI_. Lowercase _azd_ command.
 
 ### Computer and Device Terms
 

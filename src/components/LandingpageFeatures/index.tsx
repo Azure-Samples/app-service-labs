@@ -2,16 +2,16 @@ import { ReactNode } from 'react';
 import  TypewriterComponent  from '../TypewriterComponent';
 import ImageRotator from '../ImageRotator';
 import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './styles.module.css';
-// import LearnerSVG from '../../../static/img/learner2.svg';
 
 
 const keywords = [
-    'cloud computing',
-    'cloud native',
+    'web apps',
+    'APIs',
     'containers',
-    'Kubernetes',
-    'Azure Kubernetes Service',
+    'cloud-native apps',
+    'Azure App Service',
   ];
 
   interface LandingpageFeaturesProps {
@@ -24,19 +24,19 @@ export default function LandingpageFeatures({ images }: LandingpageFeaturesProps
         //<section className={styles.largetext}>    
             <div className='container no-sidebar'>
                 <div className="row">
-                   <img className={styles.logo} src={require('../../../static/img/aks-logo-dark.png').default}  alt="AKS Labs logo"  />
+                   <img className={styles.logo} src={useBaseUrl('/img/app-service-labs-logo.svg')}  alt="App Service Labs logo"  />
                 </div>
                 <div className='row'>
                     <div className='col col--6'>
                         <div className="row">
                             <div className={styles.largetext}>
-                                Hands-on tutorials to <span className={styles.purpletext}>learn</span> <br />
-                                and <span className={styles.purpletext}>teach</span> <TypewriterComponent words={keywords} />
+                                Hands-on tutorials to <span className={styles.accenttext}>learn</span> <br />
+                                and <span className={styles.accenttext}>teach</span> <TypewriterComponent words={keywords} />
                             </div>
                         </div>
                         <div className="row">
                             <div className={`${styles.subtitle}`}> 
-                                Grab-and-go resources to help you learn new skills but also <a href="./contributing">contribute</a> your own workshop to help others in their AKS learning journey.
+                                Grab-and-go resources to help you learn new skills but also <a href="./contributing">contribute</a> your own workshop to help others on their App Service learning journey.
                             </div>
                         </div>
                         <div className='row'>
@@ -50,8 +50,6 @@ export default function LandingpageFeatures({ images }: LandingpageFeaturesProps
                         </div>
                     </div>
                     <div className='col col--6'>
-                        {/* <img className={styles.img450x450} src={require('../../../static/img/learner2.png').default} /> */}
-                        {/* <LearnerSVG className={styles.img450x450} /> */}
                         <div className={styles.img450x450}>
                             <ImageRotator images={images} />
                         </div>
