@@ -1,0 +1,8 @@
+{
+  "label": "Security & Identity",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "description": "Secure your app and its secrets with managed identity, Key Vault, and Entra ID authentication. Under construction."
+  }
+}
