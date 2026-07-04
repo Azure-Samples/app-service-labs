@@ -17,9 +17,15 @@ walk through complete, modern scenarios end-to-end — many drawn from the lates
   CLI, or the portal), and secure it with OAuth 2.0 / Microsoft Entra ID using
   Easy Auth so AI agents like GitHub Copilot can call it safely.
 
+- **[Build and deploy an AI-powered app](./deploy-an-ai-app.md)**
+  — Build a web app (Python or Node.js) that calls an
+  [Azure OpenAI](https://learn.microsoft.com/azure/ai-services/openai/overview)
+  `gpt-4o` model, deploy it to App Service three ways (azd, Azure CLI, or the
+  portal), and reach Azure OpenAI with a **managed identity** so there are no
+  API keys in your code or configuration.
+
 More scenario labs are on the way, including:
 
 - Scale stateless MCP and API workloads
 - Use **API Management as an AI/tool gateway** in front of App Service
-- Build and deploy an **AI app** (Azure OpenAI + App Service)
 - Add authentication to an API end-to-end with **Easy Auth**
