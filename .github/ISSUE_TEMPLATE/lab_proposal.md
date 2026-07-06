@@ -15,12 +15,18 @@ assignees: ''
 
 **Potential category. Please check one.**
 <!-- Choose from one of the existing categories. -->
+- [ ] Getting Started
+- [ ] Scenarios & Modern Apps
+- [ ] Deployment & CI/CD
+- [ ] Configuration
 - [ ] Networking
-- [ ] Security
-- [ ] Storage
-- [ ] Operations
-- [ ] AI/ML
-- [ ] Platform Engineering
+- [ ] Security & Identity
+- [ ] Scaling & Performance
+- [ ] Monitoring & Diagnostics
+- [ ] Data & Integration
+- [ ] Reliability & Operations
+- [ ] Migration & Modernization
+- [ ] Advanced
 - [ ] Other. Please specify in a new line below if none of the categories above fit.
 
 **Are you willing to be added to the CODEOWNERS file for this lab?**
