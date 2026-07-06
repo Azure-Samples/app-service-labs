@@ -130,7 +130,7 @@ azd auth login
 
 ### 2. Create the project structure
 
-Create a new folder and add the three files below. The `infra/main.bicep` file is shared across every language - only the app code and two values change per language (shown in the table further down).
+Create a new folder and add the four files below. The `infra/main.bicep` and `infra/resources.bicep` files are shared across every language - only the app code and two values change per language (the `language` value in `azure.yaml` and `linuxFxVersion` in `infra/main.parameters.json`).
 
 ```bash
 mkdir my-first-web-app && cd my-first-web-app
@@ -145,7 +145,7 @@ name: my-first-web-app
 services:
   web:
     project: ./src
-    language: js # change per language: js, dotnet, python, java, php
+    language: js # change per language: js, dotnet, python, java
     host: appservice
 ```
 
@@ -156,24 +156,62 @@ Create `infra/main.parameters.json`:
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "environmentName": { "value": "${AZURE_ENV_NAME}" },
     "location": { "value": "${AZURE_LOCATION}" },
+    "resourceGroupName": { "value": "${AZURE_RESOURCE_GROUP}" },
     "linuxFxVersion": { "value": "NODE|22-lts" }
   }
 }
 ```
 
-Create `infra/main.bicep`:
+Create `infra/main.bicep`. It runs at subscription scope so `azd` creates and owns the resource group for this environment - the reliable pattern that avoids reusing a shared group:
 
 ```bicep
-targetScope = 'resourceGroup'
+targetScope = 'subscription'
+
+@description('Name of the azd environment; used to derive resource names.')
+param environmentName string
 
 @description('Azure region for all resources.')
-param location string = resourceGroup().location
+param location string
+
+@description('Resource group to create for this environment.')
+param resourceGroupName string
 
 @description('Runtime stack for the web app, for example NODE|22-lts or DOTNETCORE|8.0.')
 param linuxFxVersion string = 'NODE|22-lts'
 
-var suffix = uniqueString(resourceGroup().id)
+resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
+  name: resourceGroupName
+  location: location
+}
+
+module resources 'resources.bicep' = {
+  name: 'resources'
+  scope: rg
+  params: {
+    location: location
+    environmentName: environmentName
+    linuxFxVersion: linuxFxVersion
+  }
+}
+
+output WEB_URI string = resources.outputs.webUri
+```
+
+Create `infra/resources.bicep`:
+
+```bicep
+@description('Azure region for all resources.')
+param location string
+
+@description('azd environment name used to derive globally unique names.')
+param environmentName string
+
+@description('Runtime stack for the web app, for example NODE|22-lts or DOTNETCORE|8.0.')
+param linuxFxVersion string = 'NODE|22-lts'
+
+var suffix = uniqueString(subscription().id, resourceGroup().id, environmentName)
 var planName = 'plan-${suffix}'
 var webName = 'app-${suffix}'
 
@@ -211,7 +249,7 @@ resource web 'Microsoft.Web/sites@2023-12-01' = {
   }
 }
 
-output WEB_URI string = 'https://${web.properties.defaultHostName}'
+output webUri string = 'https://${web.properties.defaultHostName}'
 ```
 
 ### 3. Add your app code
@@ -295,26 +333,20 @@ Requires a [JDK](https://learn.microsoft.com/java/openjdk/download) and [Maven](
 
 <TabItem value="php" label="PHP">
 
-Requires [PHP](https://www.php.net/downloads). Set `language: php` and `linuxFxVersion` to `PHP|8.4`. PHP is supported on **Linux plans only**.
-
-Create `src/index.php`:
-
-```php
-<?php echo "<h1>Hello from Azure App Service!</h1>"; ?>
-```
+The minimal **azd** workflow in this lab doesn't support `language: php` in `azure.yaml` (`azd` has no built-in PHP framework service), so `azd up` fails for PHP. Use the **Azure CLI (az)** tab above for the PHP variant of this lab - it deploys PHP to a Linux plan reliably.
 
 </TabItem>
 
 </Tabs>
 
-### 4. Create a resource group and provision
+### 4. Create an environment and provision
 
-Create the resource group that will hold all lab resources, then point `azd` at it:
+Create an `azd` environment with a unique suffix (so the resource group and app names don't collide with earlier runs), then let `azd` create the resource group and deploy:
 
 ```bash
-az group create --name rg-firstwebapp --location eastus
-azd env new my-first-web-app --location eastus
-azd env set AZURE_RESOURCE_GROUP rg-firstwebapp
+SUFFIX=$(openssl rand -hex 3)   # 6 lowercase hex chars
+azd env new "my-first-web-app-${SUFFIX}" --location eastus
+azd env set AZURE_RESOURCE_GROUP "rg-firstwebapp-${SUFFIX}"
 ```
 
 Provision the infrastructure and deploy your code in one step:
@@ -330,12 +362,16 @@ When it finishes, `azd` prints the app endpoint:
 SUCCESS: Your application was deployed to Azure in 3 minutes 46 seconds.
 ```
 
+:::note First azd up can't find the tagged resource
+On the very first `azd up`, `azd` occasionally reports `unable to find a resource tagged with 'azd-service-name: web'` because the provisioning outputs aren't cached yet. If that happens, run `azd deploy` once more - the resources already exist and the code deploy completes.
+:::
+
 :::warning One azd service per resource group
-`azd` finds your app by the `azd-service-name: web` tag. If you deploy more than one `azd` app into the **same** resource group, deployment fails with `expecting only '1' resource tagged with 'azd-service-name: web', but found '2'`. Use a separate resource group per `azd` app.
+`azd` finds your app by the `azd-service-name: web` tag. If you deploy more than one `azd` app into the **same** resource group, deployment fails with `expecting only '1' resource tagged with 'azd-service-name: web', but found '2'`. The unique suffix above gives each run its own resource group, which avoids this.
 :::
 
 :::note Windows plans with azd
-The Bicep above targets Linux. For a Windows plan, remove `reserved: true`, change `kind` to `app`, and replace `linuxFxVersion` with a Windows setting - for example `netFrameworkVersion: 'v8.0'` for .NET or `nodeVersion: '~22'` for Node.js. Python and PHP aren't available on Windows plans.
+The Bicep in `infra/resources.bicep` targets Linux. For a Windows plan, remove `reserved: true`, change `kind` to `app`, and replace `linuxFxVersion` with a Windows setting - for example `netFrameworkVersion: 'v8.0'` for .NET or `nodeVersion: '~22'` for Node.js. Python and PHP aren't available on Windows plans.
 :::
 
 </TabItem>

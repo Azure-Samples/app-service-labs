@@ -312,12 +312,25 @@ import os
 import random
 
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+# FastMCP enables DNS-rebinding protection and, by default, only trusts
+# localhost. On App Service the request Host header is <app>.azurewebsites.net,
+# which would otherwise be rejected with HTTP 421 "Invalid Host header".
+# App Service exposes that hostname as WEBSITE_HOSTNAME, so add it (plus
+# localhost for local runs) to the allowed hosts.
+allowed_hosts = ["localhost", "localhost:*", "127.0.0.1", "127.0.0.1:*"]
+website_hostname = os.environ.get("WEBSITE_HOSTNAME")
+if website_hostname:
+    allowed_hosts += [website_hostname, f"{website_hostname}:*"]
+
+security = TransportSecuritySettings(allowed_hosts=allowed_hosts)
+
 # stateless_http=True keeps no session state in memory, so any App Service
 # instance can serve any request when you scale out.
-mcp = FastMCP("appservice-mcp-demo", stateless_http=True)
+mcp = FastMCP("appservice-mcp-demo", stateless_http=True, transport_security=security)
 
 
 @mcp.tool()
