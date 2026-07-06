@@ -256,6 +256,17 @@ npm start
 
 This will start a local server that you can access at [http://localhost:3000](http://localhost:3000) to see your changes.
 
+Before you open a pull request, run the build gate from the root of the project and make sure both
+commands pass:
+
+```shell
+npm run typecheck
+npm run build
+```
+
+The site uses `onBrokenLinks: 'throw'`, so `npm run build` fails on any broken internal link. Fixing
+these locally avoids a failed check on your pull request.
+
 ### Testing Remotely {#test-remotely}
 
 You may also want to have others test your workshop prior to submitting a PR. To test your changes remotely or share a publicly accessible URL with team members, you can deploy your changes to a GitHub Pages site by following these steps in your forked repository:
@@ -275,5 +286,39 @@ Once the workflow has completed, you can access your site at `https://<your-gith
 GitHub Pages in your forked repository will only build and deploy when changes are pushed to the main branch of your fork. So if you are working on a feature branch, you will need to merge your changes into the main branch to see them deployed to GitHub Pages.
 
 :::
+
+### Testing on Azure {#test-azure}
+
+Every lab must be run against real Azure before you open a pull request - the step-by-step
+instructions and any commands need to actually work. For each tooling path your lab documents (`azd`,
+Azure CLI, and the portal):
+
+1. Run the lab end to end on a real subscription, using a dedicated resource group on the smallest
+   reasonable tier.
+2. Capture the success signal (for a web app, a request returning HTTP 200 with the expected body).
+3. Tear everything down and confirm nothing is left running or billable: delete the resource group,
+   verify `az group exists -n <rg>` returns `false`, and purge any soft-deleted resources.
+
+Include this validation evidence in your pull request description.
+
+### Authoring with AI assistants (Copilot / Claude) {#ai-authoring}
+
+This repository ships instructions and agents so AI assistants (GitHub Copilot, Claude, and similar
+tools) author and review labs the same consistent way. You do not have to use them, but they capture
+the full procedure and standards described on this page.
+
+- **Standards, always applied.** `.github/instructions/lab-authoring.instructions.md` defines the
+  required lab structure, the tooling / language / OS pivots, content rules, the Azure validation
+  protocol, the build gate, and the definition of done. Copilot loads it automatically when you edit
+  files under `docs/`.
+- **The `lab-author` agent.** `.github/agents/lab-author.agent.md` orchestrates authoring end to end -
+  scaffold, write, validate on Azure, tear down, gate the build, and open a PR. Ask your assistant to
+  "author a new lab about ..." to invoke it.
+- **The `lab-qa-reviewer` agent.** `.github/agents/lab-qa-reviewer.agent.md` executes a finished lab
+  as a first-time learner and reports issues. Ask your assistant to "test this lab end to end."
+
+Even with an assistant, you are responsible for the result: verify every step ran on real Azure, that
+test resources were deleted, that the build passes, and that no secrets or personal identifiers were
+committed.
 
 That's it! Thank you for your contribution!
