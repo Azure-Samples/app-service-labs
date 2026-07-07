@@ -4,6 +4,24 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
+// Microsoft Clarity analytics. Defaults to the App Service Labs production
+// project ID, but can be overridden or disabled with the CLARITY_PROJECT_ID
+// environment variable (set it to an empty string to turn tracking off, for
+// example in a fork). The project ID is not a secret; it ships in client-side
+// JavaScript on every page.
+const clarityProjectId =
+  process.env.CLARITY_PROJECT_ID ??
+  (process.env.NODE_ENV === 'production' ? 'xivu5543fd' : '');
+const clarityHeadTags: Config['headTags'] = clarityProjectId
+  ? [
+      {
+        tagName: 'script',
+        attributes: {type: 'text/javascript'},
+        innerHTML: `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window, document, "clarity", "script", "${clarityProjectId}");`,
+      },
+    ]
+  : [];
+
 const config: Config = {
   title: 'App Service Labs',
   tagline: 'Learn Azure App Service by building with App Service',
@@ -26,6 +44,9 @@ const config: Config = {
     mermaid: true,
   },
   themes: ['@docusaurus/theme-mermaid'],
+
+  // Microsoft Clarity analytics script (only injected when CLARITY_PROJECT_ID is set)
+  headTags: clarityHeadTags,
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
