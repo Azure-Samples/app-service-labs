@@ -74,14 +74,16 @@ export const paths: Record<string, LearningPathDef> = {
         summary: 'Add rules that add and remove instances as load changes.',
         category: 'Scaling & performance',
         time: '20-30 min',
-        status: 'coming-soon',
+        to: '/docs/learning-paths/scale-out-with-autoscale',
+        status: 'available',
       },
       {
         title: 'Release safely with deployment slots',
         summary: 'Stage changes and swap with zero downtime.',
         category: 'Deployment & CI/CD',
         time: '25-35 min',
-        status: 'coming-soon',
+        to: '/docs/learning-paths/release-with-deployment-slots',
+        status: 'available',
       },
       {
         title: 'Add monitoring and alerts',

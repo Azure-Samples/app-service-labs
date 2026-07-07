@@ -29,6 +29,9 @@ const config = {
   // Read as an ordinary env var. A later lab points this at a Key Vault
   // reference, so App Service resolves the real value at runtime.
   partnerApiKey: process.env.PARTNER_API_KEY || '',
+  // A release marker you set per version. The deployment slots lab sets this to
+  // a new value in the staging slot, so a swap visibly moves it into production.
+  appVersion: process.env.APP_VERSION || '1.0',
 };
 
 // --- Data source (step 3 turns this on with AZURE_SQL_SERVER) -------------------
@@ -89,6 +92,7 @@ app.get('/api/info', async (_req, res) => {
     catalogTitle: config.catalogTitle,
     dataSource: useSql ? 'azure-sql' : 'in-memory',
     partnerIntegration: config.partnerApiKey ? 'configured' : 'not-configured',
+    appVersion: config.appVersion,
     node: process.version,
   });
 });
@@ -133,6 +137,7 @@ function renderPage({ source, products, error }) {
   const partner = config.partnerApiKey
     ? '<span class="badge partner">Partner integration: configured</span>'
     : '';
+  const version = `<span class="badge version">Version: ${escapeHtml(config.appVersion)}</span>`;
   const cards = products
     .map(
       (p) => `
@@ -164,6 +169,7 @@ function renderPage({ source, products, error }) {
     .badge.sql { background: #d3f0dd; color: #0a5a2a; }
     .badge.mem { background: #fff2cc; color: #7a5a00; }
     .badge.partner { background: #e4d6f7; color: #5a2a8a; }
+    .badge.version { background: #d7e9fb; color: #0a4a8a; }
     main { max-width: 960px; margin: 1.25rem auto; padding: 0 1.5rem 2.5rem; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
     .card { background: #fff; border: 1px solid #e1e4e8; border-radius: 10px; padding: 1rem 1.1rem; }
@@ -179,7 +185,7 @@ function renderPage({ source, products, error }) {
     <h1>${escapeHtml(config.catalogTitle)}</h1>
     <p>${escapeHtml(config.welcomeMessage)}</p>
   </header>
-  <div class="badges">${badge}${partner}</div>
+  <div class="badges">${badge}${partner}${version}</div>
   <main>
     ${errorBanner}
     <div class="grid">${cards}</div>
