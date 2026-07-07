@@ -41,7 +41,7 @@ By the end of this step you will be able to:
 <Prerequisites
   tools={[
     { name: 'Azure Developer CLI (azd)', url: 'https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd' },
-    { name: 'Node.js 20 or later', url: 'https://nodejs.org/' },
+    { name: 'Node.js 22 or later', url: 'https://nodejs.org/' },
   ]}
 />
 
@@ -141,7 +141,7 @@ PLAN_NAME="plan-contoso-widgets"
 ```
 
 Create the resource group, a Linux App Service plan on B1, and the web app on
-Node 20:
+Node 22:
 
 ```bash
 az group create --name "$RESOURCE_GROUP" --location "$LOCATION"
@@ -157,7 +157,7 @@ az webapp create \
   --name "$APP_NAME" \
   --resource-group "$RESOURCE_GROUP" \
   --plan "$PLAN_NAME" \
-  --runtime "NODE:20-lts"
+  --runtime "NODE:22-lts"
 ```
 
 Turn on the system-assigned managed identity now, so later steps can grant it

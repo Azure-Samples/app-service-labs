@@ -181,13 +181,15 @@ ALTER ROLE db_datareader ADD MEMBER [APP_NAME_HERE];
 <TabItem value="az" label="Azure CLI (az)">
 
 Save the SQL above to `setup.sql` (with your app name substituted), then run it
-with `sqlcmd` using your Azure CLI login:
+with the [sqlcmd](https://learn.microsoft.com/sql/tools/sqlcmd/sqlcmd-utility)
+utility. The `ActiveDirectoryDefault` method reuses your Azure CLI login, so there
+is no password prompt:
 
 ```bash
 sed "s/APP_NAME_HERE/$APP_NAME/g" setup.sql > setup.ready.sql
 
 sqlcmd -S "$SQL_SERVER.database.windows.net" -d "$SQL_DB" \
-  --authentication-method ActiveDirectoryAzureCli \
+  --authentication-method ActiveDirectoryDefault \
   -i setup.ready.sql
 ```
 

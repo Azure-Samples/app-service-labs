@@ -38,7 +38,7 @@ resource web 'Microsoft.Web/sites@2023-12-01' = {
     serverFarmId: plan.id
     httpsOnly: true
     siteConfig: {
-      linuxFxVersion: 'NODE|20-lts'
+      linuxFxVersion: 'NODE|22-lts'
       alwaysOn: appServiceSku != 'F1' && appServiceSku != 'D1'
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
