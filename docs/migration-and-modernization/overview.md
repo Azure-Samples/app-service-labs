@@ -3,19 +3,25 @@ title: Overview
 sidebar_position: 1
 ---
 
-import UnderConstruction from '@site/src/components/UnderConstruction';
-
 # Migration & Modernization
 
-<UnderConstruction title="This section is under construction">
-  We're building hands-on labs for this area. In the meantime, explore the official [App Service documentation](https://learn.microsoft.com/azure/app-service/).
-</UnderConstruction>
+These labs cover how to move existing apps to Azure App Service and modernize
+legacy Windows workloads - lifting infrastructure-dependent .NET Framework and
+IIS apps into PaaS with minimal rewrites.
 
-When ready, this section will cover:
+## Labs in this section
 
-- Migrate from on-prem IIS / .NET Framework
-- App Service Migration Assistant
-- Containerize an existing app
-- Lift-and-improve legacy Windows apps to **[Managed Instance](https://learn.microsoft.com/azure/app-service/overview-managed-instance)** (COM, MSI, registry, IIS config)
+- **[Migrate an ASP.NET app to Managed Instance on App Service](./managed-instance.md)**
+  - Move a legacy ASP.NET Framework app to a
+    [Managed Instance](https://learn.microsoft.com/azure/app-service/overview-managed-instance)
+    plan (preview) that keeps the managed platform while letting you customize
+    the OS. Stage a configuration (install) script, create a **P1V4** plan in
+    custom mode with a plan-level **managed identity**, deploy the app, and
+    confirm the OS-level customization took effect.
+
+More labs are on the way, including:
+
+- App Service Migration Assistant for on-prem IIS / .NET Framework apps
+- Containerize an existing app for App Service
 
 For reference, see the [Migrate to App Service](https://learn.microsoft.com/azure/app-service/overview-migrate) documentation.
