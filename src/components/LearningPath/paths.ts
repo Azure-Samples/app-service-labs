@@ -27,11 +27,11 @@ export const paths: Record<string, LearningPathDef> = {
   'enterprise-web-app': {
     title: 'From first deploy to enterprise-grade',
     tagline:
-      'Carry one app - Contoso Widgets - from a plain first deploy to an enterprise-grade app, adding one capability per step.',
+      'Carry one app - Zava Widgets - from a plain first deploy to an enterprise-grade app, adding one capability per step.',
     steps: [
       {
         title: 'Deploy the app',
-        summary: 'Get Contoso Widgets running on App Service with its in-memory catalog.',
+        summary: 'Get Zava Widgets running on App Service with its in-memory catalog.',
         category: 'Getting started',
         time: '15-20 min',
         to: '/docs/learning-paths/deploy-the-app',

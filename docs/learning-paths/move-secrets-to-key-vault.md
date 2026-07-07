@@ -11,7 +11,7 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 # Step 4: Move secrets to Key Vault
 
 This is step 4 of the [enterprise web app learning path](/docs/learning-paths/overview).
-In [step 3](/docs/learning-paths/connect-a-database) you connected Contoso Widgets
+In [step 3](/docs/learning-paths/connect-a-database) you connected Zava Widgets
 to a database with no stored password. Now the app needs another kind of secret: a
 **partner API key** for an integration. The tempting shortcut is to paste the key
 into an app setting, but then the raw value lives in your configuration, shows up in
@@ -50,7 +50,7 @@ You need the resource group and web app from the earlier steps, plus the app's
 managed identity (you turned it on in step 1). Reuse your variables:
 
 ```bash
-RESOURCE_GROUP="rg-contoso-widgets"
+RESOURCE_GROUP="rg-zava-widgets"
 APP_NAME="<your-app-name>"
 LOCATION="eastus"
 ```
@@ -58,7 +58,7 @@ LOCATION="eastus"
 If you deployed with `azd`, read the names from your environment:
 
 ```bash
-cd app-service-labs/samples/contoso-widgets
+cd app-service-labs/samples/zava-widgets
 RESOURCE_GROUP=$(azd env get-values | grep RESOURCE_GROUP_NAME | cut -d'"' -f2)
 APP_NAME=$(azd env get-values | grep WEB_APP_NAME | cut -d'"' -f2)
 ```
@@ -102,7 +102,7 @@ store the partner key. The value here is a throwaway demo string - never put a r
 secret in a lab.
 
 ```bash
-VAULT="kv-contoso-$RANDOM"
+VAULT="kv-zava-$RANDOM"
 SECRET_NAME="partner-api-key"
 
 az keyvault create \
@@ -121,16 +121,16 @@ az role assignment create \
 # Role assignments can take a few seconds to propagate before the next command works.
 az keyvault secret set \
   --vault-name "$VAULT" --name "$SECRET_NAME" \
-  --value "contoso-partner-demo-key-do-not-use-in-prod"
+  --value "zava-partner-demo-key-do-not-use-in-prod"
 ```
 
 </TabItem>
 <TabItem value="portal" label="Azure portal">
 
 1. In the [Azure portal](https://portal.azure.com), search for **Key vaults** and select **Create**.
-2. Choose your resource group, name the vault (for example, `kv-contoso-<unique>`), pick **East US**, and on the **Access configuration** tab set **Permission model** to **Azure role-based access control**. Select **Review + create**, then **Create**.
+2. Choose your resource group, name the vault (for example, `kv-zava-<unique>`), pick **East US**, and on the **Access configuration** tab set **Permission model** to **Azure role-based access control**. Select **Review + create**, then **Create**.
 3. Open the vault, select **Access control (IAM)** > **Add** > **Add role assignment**, choose **Key Vault Secrets Officer**, assign it to your own user, and select **Review + assign**.
-4. In the vault, select **Objects** > **Secrets** > **Generate/Import**. Name the secret `partner-api-key`, set the value to a throwaway string such as `contoso-partner-demo-key-do-not-use-in-prod`, and select **Create**.
+4. In the vault, select **Objects** > **Secrets** > **Generate/Import**. Name the secret `partner-api-key`, set the value to a throwaway string such as `zava-partner-demo-key-do-not-use-in-prod`, and select **Create**.
 
 </TabItem>
 </Tabs>
@@ -242,7 +242,7 @@ in configuration.
 
 ## Summary
 
-Contoso Widgets now reads a secret without the secret ever touching your code or
+Zava Widgets now reads a secret without the secret ever touching your code or
 configuration. The value lives in Key Vault; the app's identity holds a single
 read-only role; and the app setting holds only a reference that App Service resolves
 at runtime. Your app is data-driven, configured, and keyless. Next you make it

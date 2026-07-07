@@ -12,7 +12,7 @@ import Prerequisites from '@site/src/components/SharedMarkdown/_prerequisites.md
 # Step 1: Deploy the app
 
 This is the first step of the [enterprise web app learning path](/docs/learning-paths/overview).
-You start by deploying **Contoso Widgets**, a small Node.js product-catalog app,
+You start by deploying **Zava Widgets**, a small Node.js product-catalog app,
 to [Azure App Service](https://learn.microsoft.com/azure/app-service/overview).
 Right now the app serves a hard-coded, in-memory list of products. Over the next
 steps you add configuration, a database, and more - all without rewriting the app.
@@ -55,7 +55,7 @@ a low-cost Linux tier (about USD 13/month) that is ideal for learning.
 
 ## Meet the app
 
-Contoso Widgets is intentionally small. The important idea is that every
+Zava Widgets is intentionally small. The important idea is that every
 capability you add later is gated behind an **app setting** (an environment
 variable), so the same code grows from a first deploy into an enterprise-grade
 app. The app exposes a few endpoints:
@@ -79,7 +79,7 @@ Clone the repository and move into the app folder.
 
 ```bash
 git clone https://github.com/Azure-Samples/app-service-labs.git
-cd app-service-labs/samples/contoso-widgets
+cd app-service-labs/samples/zava-widgets
 ```
 
 The folder has three parts: `src/` (the Express app), `infra/` (the Bicep that
@@ -114,7 +114,7 @@ azd auth login
 azd up
 ```
 
-When prompted, enter an **environment name** (for example, `contoso-widgets`),
+When prompted, enter an **environment name** (for example, `zava-widgets`),
 choose your subscription, and choose the **East US** location. `azd` creates a
 resource group named `rg-<environment-name>`, provisions the App Service plan and
 web app from `infra/`, and deploys the code from `src/`.
@@ -134,10 +134,10 @@ Sign in and set a few variables. Reuse these exact names in later steps.
 ```bash
 az login
 
-RESOURCE_GROUP="rg-contoso-widgets"
+RESOURCE_GROUP="rg-zava-widgets"
 LOCATION="eastus"
-APP_NAME="contoso-widgets-$RANDOM"
-PLAN_NAME="plan-contoso-widgets"
+APP_NAME="zava-widgets-$RANDOM"
+PLAN_NAME="plan-zava-widgets"
 ```
 
 Create the resource group, a Linux App Service plan on B1, and the web app on
@@ -219,7 +219,7 @@ You should see a response like this, confirming the app is live and serving its
 in-memory catalog:
 
 ```json
-{"catalogTitle":"Contoso Widgets","dataSource":"in-memory","partnerIntegration":"not-configured","node":"v20.x.x"}
+{"catalogTitle":"Zava Widgets","dataSource":"in-memory","partnerIntegration":"not-configured","node":"v20.x.x"}
 ```
 
 Open `$APP_URL` in a browser to see the storefront.
@@ -231,7 +231,7 @@ group. You only clean up at the end of the path.
 
 ## Summary
 
-You deployed Contoso Widgets to App Service and confirmed it serves its in-memory
+You deployed Zava Widgets to App Service and confirmed it serves its in-memory
 catalog. You also turned on the app's managed identity up front - an identity the
 app does not need yet, but which later steps use to reach a database and Key Vault
 without a single stored secret. Next, you move the app's configuration out of the

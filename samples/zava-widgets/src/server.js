@@ -1,4 +1,4 @@
-// Contoso Widgets - sample app for the App Service enterprise web app learning path.
+// Zava Widgets - sample app for the App Service enterprise web app learning path.
 //
 // The app is intentionally small, but every capability the labs add is gated
 // behind an app setting (environment variable). That lets the SAME app grow
@@ -22,7 +22,7 @@ const port = process.env.PORT || 3000;
 
 // --- Configuration (step 2 fills these in from App Service app settings) -------
 const config = {
-  catalogTitle: process.env.CATALOG_TITLE || 'Contoso Widgets',
+  catalogTitle: process.env.CATALOG_TITLE || 'Zava Widgets',
   welcomeMessage:
     process.env.WELCOME_MESSAGE ||
     'Smart home gear that just works. Set WELCOME_MESSAGE in your app settings to personalize this line.',
@@ -115,7 +115,7 @@ app.get('/', async (_req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Contoso Widgets listening on port ${port} (data source: ${useSql ? 'azure-sql' : 'in-memory'})`);
+  console.log(`Zava Widgets listening on port ${port} (data source: ${useSql ? 'azure-sql' : 'in-memory'})`);
 });
 
 // --- View ----------------------------------------------------------------------

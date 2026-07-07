@@ -1,4 +1,4 @@
-# Contoso Widgets
+# Zava Widgets
 
 A small Node.js (Express) product-catalog web app used by the **From first deploy
 to enterprise-grade on Azure App Service** learning path.

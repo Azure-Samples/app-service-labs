@@ -11,13 +11,13 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 # Step 2: Externalize configuration
 
 This is step 2 of the [enterprise web app learning path](/docs/learning-paths/overview).
-In [step 1](/docs/learning-paths/deploy-the-app) you deployed Contoso Widgets and
+In [step 1](/docs/learning-paths/deploy-the-app) you deployed Zava Widgets and
 it served a hard-coded title and welcome message. Hard-coding those means a change
 requires a redeploy, and the same build cannot be reused across environments. In
 this step you move that configuration into **App Service app settings**, so you can
 change it without touching the code.
 
-App settings are exposed to your app as environment variables. Contoso Widgets
+App settings are exposed to your app as environment variables. Zava Widgets
 already reads `CATALOG_TITLE` and `WELCOME_MESSAGE` from the environment and falls
 back to defaults when they are absent - so you only need to set them.
 
@@ -43,14 +43,14 @@ You need the resource group and web app you created in step 1. If you deployed
 with the Azure CLI, reuse the same variables:
 
 ```bash
-RESOURCE_GROUP="rg-contoso-widgets"
+RESOURCE_GROUP="rg-zava-widgets"
 APP_NAME="<your-app-name>"   # the name you created in step 1
 ```
 
 If you deployed with `azd`, read the names from your environment:
 
 ```bash
-cd app-service-labs/samples/contoso-widgets
+cd app-service-labs/samples/zava-widgets
 RESOURCE_GROUP=$(azd env get-values | grep RESOURCE_GROUP_NAME | cut -d'"' -f2)
 APP_NAME=$(azd env get-values | grep WEB_APP_NAME | cut -d'"' -f2)
 ```
@@ -96,7 +96,7 @@ az webapp config appsettings set \
   --name "$APP_NAME" \
   --resource-group "$RESOURCE_GROUP" \
   --settings \
-    CATALOG_TITLE="Contoso Widgets - Spring Sale" \
+    CATALOG_TITLE="Zava Widgets - Spring Sale" \
     WELCOME_MESSAGE="Fresh smart-home deals, updated daily."
 ```
 
@@ -108,7 +108,7 @@ The command returns the full list of app settings. Setting them restarts the app
 1. In the [Azure portal](https://portal.azure.com), go to your web app.
 2. In the left menu, select **Settings** > **Environment variables**.
 3. On the **App settings** tab, select **Add**.
-4. Enter the name `CATALOG_TITLE` and the value `Contoso Widgets - Spring Sale`, then select **Apply**.
+4. Enter the name `CATALOG_TITLE` and the value `Zava Widgets - Spring Sale`, then select **Apply**.
 5. Select **Add** again, enter `WELCOME_MESSAGE` and the value `Fresh smart-home deals, updated daily.`, then select **Apply**.
 6. Select **Apply** at the bottom of the page, then **Confirm** to save. The app restarts.
 
@@ -127,7 +127,7 @@ curl -s "$APP_URL/api/info"
 The `catalogTitle` now reflects your setting:
 
 ```json
-{"catalogTitle":"Contoso Widgets - Spring Sale","dataSource":"in-memory","partnerIntegration":"not-configured","node":"v22.x.x"}
+{"catalogTitle":"Zava Widgets - Spring Sale","dataSource":"in-memory","partnerIntegration":"not-configured","node":"v22.x.x"}
 ```
 
 Open `$APP_URL` in a browser. The header shows the new title and welcome message -

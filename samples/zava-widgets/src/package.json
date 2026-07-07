@@ -1,5 +1,5 @@
 {
-  "name": "contoso-widgets",
+  "name": "zava-widgets",
   "version": "1.0.0",
   "description": "Sample product-catalog web app for the App Service enterprise web app learning path. Capabilities are gated behind app settings so the same app grows from a first deploy to an enterprise-grade app across the labs.",
   "engines": {

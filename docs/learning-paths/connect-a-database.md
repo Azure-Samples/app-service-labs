@@ -11,7 +11,7 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 # Step 3: Connect a database with managed identity
 
 This is step 3 of the [enterprise web app learning path](/docs/learning-paths/overview).
-So far Contoso Widgets serves an in-memory catalog. Real apps keep their data in a
+So far Zava Widgets serves an in-memory catalog. Real apps keep their data in a
 database - and the tempting shortcut is to paste a database username and password
 into a connection string. This step does it the right way instead: the catalog
 moves into [Azure SQL Database](https://learn.microsoft.com/azure/azure-sql/database/sql-database-paas-overview),
@@ -19,7 +19,7 @@ and the app reads it using its **managed identity**. There is no SQL password
 anywhere - not in the code, not in configuration.
 
 The app already knows how to do this. When the `AZURE_SQL_SERVER` and
-`AZURE_SQL_DATABASE` app settings are present, Contoso Widgets connects to Azure
+`AZURE_SQL_DATABASE` app settings are present, Zava Widgets connects to Azure
 SQL with `azure-active-directory-default` authentication, which uses the app's
 identity. When they are absent, it falls back to the in-memory catalog.
 
@@ -45,7 +45,7 @@ You need the resource group and web app from the earlier steps, plus the app's
 managed identity (you turned it on in step 1). Reuse your variables:
 
 ```bash
-RESOURCE_GROUP="rg-contoso-widgets"
+RESOURCE_GROUP="rg-zava-widgets"
 APP_NAME="<your-app-name>"
 LOCATION="eastus"
 ```
@@ -53,7 +53,7 @@ LOCATION="eastus"
 If you deployed with `azd`, read the names from your environment:
 
 ```bash
-cd app-service-labs/samples/contoso-widgets
+cd app-service-labs/samples/zava-widgets
 RESOURCE_GROUP=$(azd env get-values | grep RESOURCE_GROUP_NAME | cut -d'"' -f2)
 APP_NAME=$(azd env get-values | grep WEB_APP_NAME | cut -d'"' -f2)
 ```
@@ -97,8 +97,8 @@ Set names and create an Entra-only SQL server with yourself as the admin, then a
 low-cost **Basic** database:
 
 ```bash
-SQL_SERVER="sql-contoso-$RANDOM"
-SQL_DB="contoso-catalog"
+SQL_SERVER="sql-zava-$RANDOM"
+SQL_DB="zava-catalog"
 MY_UPN=$(az ad signed-in-user show --query userPrincipalName -o tsv)
 MY_OID=$(az ad signed-in-user show --query id -o tsv)
 
@@ -138,8 +138,8 @@ az sql server firewall-rule create \
 <TabItem value="portal" label="Azure portal">
 
 1. In the [Azure portal](https://portal.azure.com), search for **SQL databases** and select **Create**.
-2. Choose your resource group, name the database `contoso-catalog`, and next to **Server** select **Create new**.
-3. Name the server (for example, `sql-contoso-<unique>`), pick **East US**, and for **Authentication method** choose **Use Microsoft Entra-only authentication**. Set yourself as the Entra admin, then select **OK**.
+2. Choose your resource group, name the database `zava-catalog`, and next to **Server** select **Create new**.
+3. Name the server (for example, `sql-zava-<unique>`), pick **East US**, and for **Authentication method** choose **Use Microsoft Entra-only authentication**. Set yourself as the Entra admin, then select **OK**.
 4. For **Workload environment**, choose **Development**, or set the **Compute + storage** to the **Basic** tier to keep costs low.
 5. On the **Networking** tab, set **Connectivity method** to **Public endpoint**, and set both **Allow Azure services...** and **Add current client IP address** to **Yes**.
 6. Select **Review + create**, then **Create**. Note the server name, which ends in `.database.windows.net`.
@@ -196,7 +196,7 @@ sqlcmd -S "$SQL_SERVER.database.windows.net" -d "$SQL_DB" \
 </TabItem>
 <TabItem value="portal" label="Azure portal">
 
-1. In the portal, open your `contoso-catalog` database and select **Query editor (preview)** in the left menu.
+1. In the portal, open your `zava-catalog` database and select **Query editor (preview)** in the left menu.
 2. Sign in with **Microsoft Entra authentication** (you are the admin).
 3. Paste the SQL above, replace both `APP_NAME_HERE` occurrences with your web app's name, and select **Run**.
 
@@ -224,7 +224,7 @@ az webapp config appsettings set \
 
 1. Go to your web app and select **Settings** > **Environment variables**.
 2. Add `AZURE_SQL_SERVER` with the value `<your-server>.database.windows.net`.
-3. Add `AZURE_SQL_DATABASE` with the value `contoso-catalog`.
+3. Add `AZURE_SQL_DATABASE` with the value `zava-catalog`.
 4. Select **Apply**, then **Confirm**. The app restarts.
 
 </TabItem>
@@ -269,7 +269,7 @@ the app's managed identity, granted `db_datareader` and nothing more.
 
 ## Summary
 
-You gave Contoso Widgets a real database and connected to it with the app's
+You gave Zava Widgets a real database and connected to it with the app's
 managed identity - no password, no connection-string secret. The app now serves
 live catalog data from Azure SQL, and its only database configuration is two
 non-secret names. You have a configured, data-driven app running securely on App

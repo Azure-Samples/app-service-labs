@@ -11,7 +11,7 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 # Step 5: Add health checks and Always On
 
 This is step 5 of the [enterprise web app learning path](/docs/learning-paths/overview).
-So far Contoso Widgets is configured, data-driven, and keyless - but the platform
+So far Zava Widgets is configured, data-driven, and keyless - but the platform
 has no way to know whether a running instance is actually healthy, and on a lower
 tier the app can go cold between requests. This step fixes both. You point App
 Service **health check** at the app's `/health` endpoint so the platform can detect
@@ -43,14 +43,14 @@ By the end of this step you will be able to:
 You need the resource group and web app from the earlier steps:
 
 ```bash
-RESOURCE_GROUP="rg-contoso-widgets"
+RESOURCE_GROUP="rg-zava-widgets"
 APP_NAME="<your-app-name>"
 ```
 
 If you deployed with `azd`, read the names from your environment:
 
 ```bash
-cd app-service-labs/samples/contoso-widgets
+cd app-service-labs/samples/zava-widgets
 RESOURCE_GROUP=$(azd env get-values | grep RESOURCE_GROUP_NAME | cut -d'"' -f2)
 APP_NAME=$(azd env get-values | grep WEB_APP_NAME | cut -d'"' -f2)
 ```
@@ -163,7 +163,7 @@ app is up without doing heavy work on every ping.
 
 ## Summary
 
-App Service now watches Contoso Widgets: it polls `/health`, is ready to pull a bad
+App Service now watches Zava Widgets: it polls `/health`, is ready to pull a bad
 instance out of rotation, and keeps the app warm with Always On. That is the
 groundwork for running more than one instance. Next you add autoscale, so the app
 grows and shrinks its instance count with load - and health check finally has
