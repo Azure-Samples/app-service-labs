@@ -80,10 +80,10 @@ const config: Config = {
         language: ["en"],
         highlightSearchTermsOnTargetPage: true,
         explicitSearchResultPath: true,
-        blogRouteBasePath: '/',
         docsRouteBasePath: ['/docs'],
-        indexBlog: true,         // Set to true to index blog
+        indexBlog: false,        // Blog is disabled (blog: false), so don't index it
         indexDocs: true,        // Set to true to index docs
+        indexPages: true,       // Index standalone pages (for example, /contributing)
       },
     ],
     require.resolve("docusaurus-plugin-image-zoom"),
