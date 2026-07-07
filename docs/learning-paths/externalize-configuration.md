@@ -127,7 +127,7 @@ curl -s "$APP_URL/api/info"
 The `catalogTitle` now reflects your setting:
 
 ```json
-{"catalogTitle":"Contoso Widgets - Spring Sale","dataSource":"in-memory","partnerIntegration":"not-configured","node":"v20.x.x"}
+{"catalogTitle":"Contoso Widgets - Spring Sale","dataSource":"in-memory","partnerIntegration":"not-configured","node":"v22.x.x"}
 ```
 
 Open `$APP_URL` in a browser. The header shows the new title and welcome message -

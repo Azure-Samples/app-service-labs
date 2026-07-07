@@ -58,14 +58,16 @@ export const paths: Record<string, LearningPathDef> = {
         summary: 'Store the partner API key in Key Vault and reference it from an app setting.',
         category: 'Security & identity',
         time: '25-35 min',
-        status: 'coming-soon',
+        to: '/docs/learning-paths/move-secrets-to-key-vault',
+        status: 'available',
       },
       {
         title: 'Add health checks and Always On',
         summary: 'Wire up the health probe and keep instances warm.',
         category: 'Reliability & operations',
         time: '15-20 min',
-        status: 'coming-soon',
+        to: '/docs/learning-paths/add-health-checks',
+        status: 'available',
       },
       {
         title: 'Scale out with autoscale',
