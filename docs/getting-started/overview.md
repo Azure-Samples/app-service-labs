@@ -17,6 +17,11 @@ servers.
   path three ways (Azure Developer CLI, Azure CLI, or the Azure portal) in your
   language of choice (.NET, Node.js, Python, Java, or PHP), on Linux or Windows.
 
+- **[Deploy a custom container](./deploy-a-custom-container.md)** — Package a web
+  app as a Docker image, push it to Azure Container Registry, and run it on App
+  Service. Deploy three ways (Azure Developer CLI, Azure CLI, or the Azure
+  portal) and pull the image with the app's managed identity.
+
 More getting-started labs are on the way.
 
 :::info App Service Labs complements Microsoft Learn
