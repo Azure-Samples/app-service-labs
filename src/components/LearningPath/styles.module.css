@@ -1,0 +1,207 @@
+/* LearningPath stepper */
+.path {
+  margin: 1.5rem 0 2rem;
+}
+
+.progress {
+  margin-bottom: 1.25rem;
+}
+
+.progressText {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-700);
+  margin-bottom: 0.4rem;
+}
+
+.bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-200);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  background: var(--ifm-color-primary);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.step:last-child {
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.marker {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #fff;
+  background: var(--ifm-color-primary);
+}
+
+.soon .marker {
+  background: var(--ifm-color-emphasis-400);
+}
+
+.doneStep .marker {
+  background: #2e8540;
+}
+
+.body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.soonTag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-700);
+}
+
+.meta {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.3rem 0 0.4rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.cat::after {
+  content: '\00b7';
+  margin-left: 0.5rem;
+}
+
+.summary {
+  margin: 0 0 0.5rem;
+  font-size: 0.92rem;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-700);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* PathNav footer */
+.nav {
+  margin: 2.5rem 0 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.navBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.navStep {
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.navLinks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.navLink {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: var(--ifm-global-radius, 8px);
+  text-decoration: none;
+}
+
+.navLink:hover {
+  border-color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.navNext {
+  text-align: right;
+}
+
+.navDir {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.navTitle {
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+}
+
+.navDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.navDisabled .navTitle {
+  color: var(--ifm-color-emphasis-700);
+}
+
+@media (max-width: 600px) {
+  .navLinks {
+    grid-template-columns: 1fr;
+  }
+
+  .navNext {
+    text-align: left;
+  }
+}

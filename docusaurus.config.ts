@@ -114,6 +114,11 @@ const config: Config = {
           label: 'Workshops',
         },
         {
+          to: '/docs/learning-paths/overview',
+          label: 'Learning paths',
+          position: 'left',
+        },
+        {
           href: 'https://azure.github.io/AppService/',
           label: 'Blog',
           position: 'left',
