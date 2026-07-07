@@ -10,8 +10,8 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 
 # Step 4: Move secrets to Key Vault
 
-This is step 4 of the [enterprise web app learning path](/docs/learning-paths/overview).
-In [step 3](/docs/learning-paths/connect-a-database) you connected Zava Widgets
+This is step 4 of the [enterprise web app learning path](/docs/learning-paths/enterprise-web-app).
+In [step 3](/docs/learning-paths/enterprise-web-app/connect-a-database) you connected Zava Widgets
 to a database with no stored password. Now the app needs another kind of secret: a
 **partner API key** for an integration. The tempting shortcut is to paste the key
 into an app setting, but then the raw value lives in your configuration, shows up in

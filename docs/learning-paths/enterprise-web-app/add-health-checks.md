@@ -10,7 +10,7 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 
 # Step 5: Add health checks and Always On
 
-This is step 5 of the [enterprise web app learning path](/docs/learning-paths/overview).
+This is step 5 of the [enterprise web app learning path](/docs/learning-paths/enterprise-web-app).
 So far Zava Widgets is configured, data-driven, and keyless - but the platform
 has no way to know whether a running instance is actually healthy, and on a lower
 tier the app can go cold between requests. This step fixes both. You point App

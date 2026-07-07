@@ -10,7 +10,7 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 
 # Step 10: Isolate the backend with private networking
 
-This is step 10 of the [enterprise web app learning path](/docs/learning-paths/overview).
+This is step 10 of the [enterprise web app learning path](/docs/learning-paths/enterprise-web-app).
 Zava Widgets reads its catalog from Azure SQL over the public endpoint, allowed
 through the SQL firewall. That works, but the traffic still traverses the public
 internet and the database is reachable from anywhere the firewall permits. For an
@@ -46,7 +46,7 @@ By the end of this step you will be able to:
 ## Before you start
 
 You need the resource group, web app, and the Azure SQL server from
-[step 3](/docs/learning-paths/connect-a-database). Your app must already read from
+[step 3](/docs/learning-paths/enterprise-web-app/connect-a-database). Your app must already read from
 Azure SQL (its `/api/products` reports `azure-sql`). Reuse your variables and set the
 network names:
 

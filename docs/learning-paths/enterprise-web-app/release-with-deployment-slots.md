@@ -10,7 +10,7 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 
 # Step 7: Release safely with deployment slots
 
-This is step 7 of the [enterprise web app learning path](/docs/learning-paths/overview).
+This is step 7 of the [enterprise web app learning path](/docs/learning-paths/enterprise-web-app).
 Right now every deploy goes straight to production. If a release is bad, users see
 it immediately. In this step you add a **deployment slot** - a live copy of the app
 with its own hostname - so you can deploy and warm up a new version in **staging**,

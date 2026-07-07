@@ -10,7 +10,7 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 
 # Step 11: Automate delivery with GitHub Actions
 
-This is the final step of the [enterprise web app learning path](/docs/learning-paths/overview).
+This is the final step of the [enterprise web app learning path](/docs/learning-paths/enterprise-web-app).
 You have deployed Zava Widgets by hand throughout this path. Enterprise teams do not
 ship that way - they push code and a pipeline takes it to production the same way every
 time. In this step you wire up **GitHub Actions** to build the app, deploy it to the
@@ -41,7 +41,7 @@ By the end of this step you will be able to:
 ## Before you start
 
 You need the resource group, web app, and the `staging` slot from
-[step 7](/docs/learning-paths/release-with-deployment-slots), and your own fork of
+[step 7](/docs/learning-paths/enterprise-web-app/release-with-deployment-slots), and your own fork of
 the sample repository on GitHub. Reuse your variables:
 
 ```bash

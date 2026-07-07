@@ -10,8 +10,8 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 
 # Step 2: Externalize configuration
 
-This is step 2 of the [enterprise web app learning path](/docs/learning-paths/overview).
-In [step 1](/docs/learning-paths/deploy-the-app) you deployed Zava Widgets and
+This is step 2 of the [enterprise web app learning path](/docs/learning-paths/enterprise-web-app).
+In [step 1](/docs/learning-paths/enterprise-web-app/deploy-the-app) you deployed Zava Widgets and
 it served a hard-coded title and welcome message. Hard-coding those means a change
 requires a redeploy, and the same build cannot be reused across environments. In
 this step you move that configuration into **App Service app settings**, so you can
