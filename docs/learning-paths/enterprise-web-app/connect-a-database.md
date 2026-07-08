@@ -10,7 +10,7 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 
 # Step 3: Connect a database with managed identity
 
-This is step 3 of the [enterprise web app learning path](/docs/learning-paths/overview).
+This is step 3 of the [enterprise web app learning path](/docs/learning-paths/enterprise-web-app).
 So far Zava Widgets serves an in-memory catalog. Real apps keep their data in a
 database - and the tempting shortcut is to paste a database username and password
 into a connection string. This step does it the right way instead: the catalog

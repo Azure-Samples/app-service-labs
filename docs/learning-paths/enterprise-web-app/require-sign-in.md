@@ -10,7 +10,7 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 
 # Step 9: Lock down access with Entra ID
 
-This is step 9 of the [enterprise web app learning path](/docs/learning-paths/overview).
+This is step 9 of the [enterprise web app learning path](/docs/learning-paths/enterprise-web-app).
 So far anyone on the internet can reach Zava Widgets. For an internal or partner-facing
 app, you want users to **sign in with Microsoft Entra ID** first. In this step you turn
 on the App Service **built-in authentication** (also called Easy Auth) so the platform

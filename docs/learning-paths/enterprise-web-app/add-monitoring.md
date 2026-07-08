@@ -10,7 +10,7 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 
 # Step 8: Add monitoring and alerts
 
-This is step 8 of the [enterprise web app learning path](/docs/learning-paths/overview).
+This is step 8 of the [enterprise web app learning path](/docs/learning-paths/enterprise-web-app).
 Zava Widgets releases safely now, but once a release is live you have little insight
 into how it behaves - how fast requests are, how often they fail, or what broke when
 something does. In this step you turn on **Application Insights** so the platform

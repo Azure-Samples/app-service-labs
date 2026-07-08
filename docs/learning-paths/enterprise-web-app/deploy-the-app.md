@@ -11,7 +11,7 @@ import Prerequisites from '@site/src/components/SharedMarkdown/_prerequisites.md
 
 # Step 1: Deploy the app
 
-This is the first step of the [enterprise web app learning path](/docs/learning-paths/overview).
+This is the first step of the [enterprise web app learning path](/docs/learning-paths/enterprise-web-app).
 You start by deploying **Zava Widgets**, a small Node.js product-catalog app,
 to [Azure App Service](https://learn.microsoft.com/azure/app-service/overview).
 Right now the app serves a hard-coded, in-memory list of products. Over the next

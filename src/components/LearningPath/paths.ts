@@ -34,7 +34,7 @@ export const paths: Record<string, LearningPathDef> = {
         summary: 'Get Zava Widgets running on App Service with its in-memory catalog.',
         category: 'Getting started',
         time: '15-20 min',
-        to: '/docs/learning-paths/deploy-the-app',
+        to: '/docs/learning-paths/enterprise-web-app/deploy-the-app',
         status: 'available',
       },
       {
@@ -42,7 +42,7 @@ export const paths: Record<string, LearningPathDef> = {
         summary: 'Move the storefront title and welcome message into app settings.',
         category: 'Configuration',
         time: '15-20 min',
-        to: '/docs/learning-paths/externalize-configuration',
+        to: '/docs/learning-paths/enterprise-web-app/externalize-configuration',
         status: 'available',
       },
       {
@@ -50,7 +50,7 @@ export const paths: Record<string, LearningPathDef> = {
         summary: 'Read the catalog from Azure SQL, passwordless, using the app identity.',
         category: 'Data & integration',
         time: '25-35 min',
-        to: '/docs/learning-paths/connect-a-database',
+        to: '/docs/learning-paths/enterprise-web-app/connect-a-database',
         status: 'available',
       },
       {
@@ -58,7 +58,7 @@ export const paths: Record<string, LearningPathDef> = {
         summary: 'Store the partner API key in Key Vault and reference it from an app setting.',
         category: 'Security & identity',
         time: '25-35 min',
-        to: '/docs/learning-paths/move-secrets-to-key-vault',
+        to: '/docs/learning-paths/enterprise-web-app/move-secrets-to-key-vault',
         status: 'available',
       },
       {
@@ -66,7 +66,7 @@ export const paths: Record<string, LearningPathDef> = {
         summary: 'Wire up the health probe and keep instances warm.',
         category: 'Reliability & operations',
         time: '15-20 min',
-        to: '/docs/learning-paths/add-health-checks',
+        to: '/docs/learning-paths/enterprise-web-app/add-health-checks',
         status: 'available',
       },
       {
@@ -74,7 +74,7 @@ export const paths: Record<string, LearningPathDef> = {
         summary: 'Add rules that add and remove instances as load changes.',
         category: 'Scaling & performance',
         time: '20-30 min',
-        to: '/docs/learning-paths/scale-out-with-autoscale',
+        to: '/docs/learning-paths/enterprise-web-app/scale-out-with-autoscale',
         status: 'available',
       },
       {
@@ -82,7 +82,7 @@ export const paths: Record<string, LearningPathDef> = {
         summary: 'Stage changes and swap with zero downtime.',
         category: 'Deployment & CI/CD',
         time: '25-35 min',
-        to: '/docs/learning-paths/release-with-deployment-slots',
+        to: '/docs/learning-paths/enterprise-web-app/release-with-deployment-slots',
         status: 'available',
       },
       {
@@ -90,7 +90,7 @@ export const paths: Record<string, LearningPathDef> = {
         summary: 'Turn on Application Insights telemetry and create alerts.',
         category: 'Monitoring & diagnostics',
         time: '30-40 min',
-        to: '/docs/learning-paths/add-monitoring',
+        to: '/docs/learning-paths/enterprise-web-app/add-monitoring',
         status: 'available',
       },
       {
@@ -98,7 +98,7 @@ export const paths: Record<string, LearningPathDef> = {
         summary: "Require sign-in with the platform's built-in authentication.",
         category: 'Security & identity',
         time: '20-30 min',
-        to: '/docs/learning-paths/require-sign-in',
+        to: '/docs/learning-paths/enterprise-web-app/require-sign-in',
         status: 'available',
       },
       {
@@ -106,7 +106,7 @@ export const paths: Record<string, LearningPathDef> = {
         summary: 'Add VNet integration and reach the database over a private endpoint.',
         category: 'Networking',
         time: '30-40 min',
-        to: '/docs/learning-paths/private-networking',
+        to: '/docs/learning-paths/enterprise-web-app/private-networking',
         status: 'available',
       },
       {
@@ -114,7 +114,7 @@ export const paths: Record<string, LearningPathDef> = {
         summary: 'Build and deploy to a slot on every push.',
         category: 'Deployment & CI/CD',
         time: '25-35 min',
-        to: '/docs/learning-paths/automate-with-github-actions',
+        to: '/docs/learning-paths/enterprise-web-app/automate-with-github-actions',
         status: 'available',
       },
     ],
@@ -124,3 +124,64 @@ export const paths: Record<string, LearningPathDef> = {
 export function getPath(pathId: string): LearningPathDef | undefined {
   return paths[pathId];
 }
+
+export interface LearningPathSummary {
+  /** Path id; matches a key in `paths` when the path is published. */
+  id: string;
+  /** Display title of the path. */
+  title: string;
+  /** One-line description shown on the path card. */
+  description: string;
+  /** Emoji shown on the card. */
+  icon: string;
+  /** Skill level. */
+  level: 'Beginner' | 'Intermediate' | 'Advanced';
+  /** Number of steps in the path. */
+  steps: number;
+  /** Estimated total time across all steps, e.g. '4-6 hours'. */
+  time: string;
+  /** Landing page for the path. Omit when the path is not published yet. */
+  to?: string;
+  /** 'available' paths are published; 'coming-soon' paths are on the roadmap. */
+  status: 'available' | 'coming-soon';
+}
+
+// Catalog of every learning path, published or planned. The section overview page
+// (<LearningPathCatalog>) renders one card per entry so users can pick a path.
+export const catalog: LearningPathSummary[] = [
+  {
+    id: 'enterprise-web-app',
+    title: 'Enterprise web app',
+    description:
+      'Carry one app from a plain first deploy to an enterprise-grade app, adding one capability per step - configuration, database, secrets, resilience, scale, monitoring, sign-in, private networking, and CI/CD.',
+    icon: '🏢',
+    level: 'Intermediate',
+    steps: 11,
+    time: '4-6 hours',
+    to: '/docs/learning-paths/enterprise-web-app',
+    status: 'available',
+  },
+  {
+    id: 'ai-app',
+    title: 'AI-powered app',
+    description:
+      'Add generative AI to a web app on App Service - connect to Azure AI Foundry, ground responses on your own data with retrieval, and ship a chat experience securely with managed identity.',
+    icon: '🤖',
+    level: 'Intermediate',
+    steps: 0,
+    time: 'Coming soon',
+    status: 'coming-soon',
+  },
+  {
+    id: 'managed-instance',
+    title: 'Modernize with Managed Instance',
+    description:
+      'Lift an existing ASP.NET application onto App Service, then modernize it step by step - OS-level customization, storage mounts, and the path to a fully managed, secure hosting model.',
+    icon: '🖥️',
+    level: 'Advanced',
+    steps: 0,
+    time: 'Coming soon',
+    status: 'coming-soon',
+  },
+];
+

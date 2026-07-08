@@ -10,7 +10,7 @@ import PathNav from '@site/src/components/LearningPath/PathNav';
 
 # Step 6: Scale out with autoscale
 
-This is step 6 of the [enterprise web app learning path](/docs/learning-paths/overview).
+This is step 6 of the [enterprise web app learning path](/docs/learning-paths/enterprise-web-app).
 Zava Widgets is reliable now - it has a health probe and stays warm - but it still
 runs on a single instance. If traffic spikes, that one instance has to absorb all of
 it. In this step you let the platform add and remove instances for you with
