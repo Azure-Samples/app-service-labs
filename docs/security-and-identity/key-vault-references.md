@@ -15,7 +15,7 @@ Apps need secrets - a database password, an API token, a signing key. The tempti
 
 In this lab you will:
 
-- Deploy a small web app that echoes a secret it reads from an environment variable (Python and Node.js are fully worked, with snippets for .NET, Java, and PHP).
+- Deploy a small web app that echoes a secret it reads from an environment variable (Python, Node.js, and Java are fully worked, with snippets for .NET and PHP).
 - Create a Key Vault in **RBAC authorization** mode and add a secret.
 - Turn on the app's **system-assigned managed identity** and grant it the **Key Vault Secrets User** role.
 - Add an app setting whose value is a Key Vault reference: `@Microsoft.KeyVault(SecretUri=...)`.
@@ -208,19 +208,82 @@ For the deployment steps, use `az webapp create --runtime "DOTNETCORE:8.0"` (Lin
 </TabItem>
 <TabItem value="java" label="Java">
 
-A Key Vault reference is just an environment variable, so `System.getenv` reads it directly. In a Spring Boot controller:
+A Key Vault reference is just an environment variable, so `System.getenv` reads it directly. This is a complete, runnable Spring Boot app. Create these three files.
+
+`pom.xml`
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.3.5</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>com.example</groupId>
+  <artifactId>kvref</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <java.version>17</java.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <!-- Produces a runnable target/app.jar that App Service starts with java -jar. -->
+    <finalName>app</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+```
+
+`src/main/java/com/example/kvref/Application.java`
 
 ```java
+package com.example.kvref;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.Map;
 
+@SpringBootApplication
 @RestController
-public class SecretController {
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 
     @GetMapping("/health")
     public Map<String, String> health() {
         return Map.of("status", "ok");
+    }
+
+    @GetMapping("/")
+    public String home() {
+        return "<h1>Key Vault reference demo on Azure App Service</h1>"
+            + "<p>GET <code>/secret</code> to see the value resolved from Key Vault.</p>";
     }
 
     // SECRET_MESSAGE arrives as a normal environment variable - no key or secret in code.
@@ -232,7 +295,18 @@ public class SecretController {
 }
 ```
 
-Package your app as an executable JAR and use a Java runtime such as `JAVA:17-java17` in the deployment steps.
+`src/main/resources/application.properties`
+
+```properties
+# App Service Linux sets the PORT environment variable; listen on it (8080 locally).
+server.port=${PORT:8080}
+```
+
+Build the runnable JAR (produces `target/app.jar`). The deployment steps below use a Java 17 runtime and deploy this JAR:
+
+```bash
+mvn -DskipTests package
+```
 
 </TabItem>
 <TabItem value="php" label="PHP">
@@ -419,6 +493,43 @@ output webUri string = 'https://${web.properties.defaultHostName}'
 }
 ```
 
+:::note For Node.js, use these azd settings
+The files above show Python. For the Node.js sample from the **Node.js** tab, change three values before you run `azd up`:
+
+- **`azure.yaml`** - set `language: js`.
+- **`infra/resources.bicep`** - set `linuxFxVersion: 'NODE|22-lts'` and remove the `appCommandLine` line so App Service runs `npm start`.
+
+`SCM_DO_BUILD_DURING_DEPLOYMENT` stays `'true'` - App Service runs `npm install` on deploy.
+:::
+
+:::note For Java, use these azd settings
+Java is deployed as a prebuilt JAR, so the azd config differs from Python and Node.js. Use the complete Spring Boot sample from the **Java** tab above, then:
+
+- **`azure.yaml`** - set `language: java` and build the JAR in a `prepackage` hook, deploying only the JAR:
+
+  ```yaml
+  services:
+    web:
+      project: .
+      language: java
+      host: appservice
+      dist: dist
+      hooks:
+        prepackage:
+          shell: sh
+          run: mvn -q -DskipTests package && rm -rf dist && mkdir dist && cp target/app.jar dist/app.jar
+  ```
+
+- **`infra/resources.bicep`** - set the runtime to Java 17, remove the `appCommandLine` line (App Service runs the JAR with `java -jar`), and set `SCM_DO_BUILD_DURING_DEPLOYMENT` to `'false'` because you deploy a prebuilt JAR:
+
+  ```bicep
+  linuxFxVersion: 'JAVA|17-java17'
+  // no appCommandLine for a Java SE app
+  ```
+
+The `SUFFIX` and `azd env set` commands below are identical for every language.
+:::
+
 Create an environment and set names. Use a unique suffix so the App Service hostname and vault name are globally unique:
 
 ```bash
@@ -466,7 +577,7 @@ export VAULT="kv-asl-${SUFFIX}"
 export SECRET_NAME="demo-secret"
 ```
 
-Create the resource group, the B1 Linux plan, and the web app (Python 3.12 shown; for Node.js use `NODE:22-lts`):
+Create the resource group, the B1 Linux plan, and the web app (Python 3.12 shown; for Node.js use `NODE:22-lts`, for Java use `JAVA:17-java17`):
 
 ```bash
 az group create --name "$RG_NAME" --location "$LOCATION"
@@ -475,6 +586,15 @@ az appservice plan create --resource-group "$RG_NAME" --name "$PLAN" --is-linux 
 
 az webapp create --resource-group "$RG_NAME" --plan "$PLAN" --name "$APP" --runtime "PYTHON:3.12"
 ```
+
+:::note Java runtime on older Azure CLI
+If `--runtime "JAVA:17-java17"` reports the runtime is not supported, your Azure CLI's bundled runtime list is out of date - App Service still supports Java 17. Create the app with a listed runtime and then set Java 17 directly:
+
+```bash
+az webapp config set --resource-group "$RG_NAME" --name "$APP" \
+  --linux-fx-version "JAVA|17-java17"
+```
+:::
 
 Turn on the system-assigned managed identity and capture its principal ID:
 
@@ -496,7 +616,14 @@ VAULT_ID=$(az keyvault show --name "$VAULT" --resource-group "$RG_NAME" --query 
 In RBAC mode, writing a secret with the CLI is a data-plane operation, so grant **yourself** the **Key Vault Secrets Officer** role on the vault, then add the secret. Role assignments can take a minute to take effect:
 
 ```bash
-MY_OID=$(az ad signed-in-user show --query id --output tsv)
+# Identify the caller. This works whether you are signed in as a user or as a
+# service principal / managed identity (for example in CI). The first command
+# returns nothing for a non-user identity, so fall back to the service principal.
+MY_OID=$(az ad signed-in-user show --query id --output tsv 2>/dev/null)
+if [ -z "$MY_OID" ]; then
+  MY_OID=$(az ad sp show --id "$(az account show --query user.name --output tsv)" \
+    --query id --output tsv)
+fi
 
 az role assignment create --assignee-object-id "$MY_OID" --assignee-principal-type User \
   --role "Key Vault Secrets Officer" --scope "$VAULT_ID"
@@ -506,6 +633,10 @@ sleep 30   # wait for the role assignment to propagate
 az keyvault secret set --vault-name "$VAULT" --name "$SECRET_NAME" \
   --value "keyless-hello-from-key-vault"
 ```
+
+:::note Assignee principal type
+The `--assignee-principal-type` above is `User`. If you ran the fallback because you are signed in as a service principal, change it to `ServicePrincipal`.
+:::
 
 Grant the app's managed identity the **Key Vault Secrets User** role - this is the only access the app gets, and it is read-only on secret values:
 
@@ -539,6 +670,19 @@ az webapp deploy --resource-group "$RG_NAME" --name "$APP" --src-path app.zip --
 The remote build can take a few minutes. If `az webapp deploy` returns a `504 GatewayTimeout`, the build is usually still finishing - wait a minute and check the endpoint. It succeeds even when the client-side poll times out.
 :::
 
+:::note For Java, deploy the prebuilt JAR
+Java is deployed as a prebuilt JAR, so there is no startup command and no server-side build. Skip the `az webapp config set --startup-file ...` step above (still set the health check), set `SCM_DO_BUILD_DURING_DEPLOYMENT` to `false` when you set the app settings, build the JAR, and deploy it with `--type jar`:
+
+```bash
+az webapp config set --resource-group "$RG_NAME" --name "$APP" \
+  --generic-configurations '{"healthCheckPath":"/health"}'
+
+mvn -DskipTests package
+az webapp deploy --resource-group "$RG_NAME" --name "$APP" \
+  --src-path target/app.jar --type jar
+```
+:::
+
 Get the hostname:
 
 ```bash
@@ -550,7 +694,7 @@ az webapp show --resource-group "$RG_NAME" --name "$APP" --query defaultHostName
 
 1. In the [Azure portal](https://portal.azure.com), select **Create a resource** > **Web App**. On the **Basics** tab set:
    - **Publish**: **Code**
-   - **Runtime stack**: **Python 3.12** (or **Node 22 LTS**)
+   - **Runtime stack**: **Python 3.12** (or **Node 22 LTS**, or **Java 17** with the **Java SE (Embedded Web Server)** stack)
    - **Operating System**: **Linux**
    - **Region**: **East US**
    - **Pricing plan**: create or select a **Basic B1** plan.
@@ -573,9 +717,9 @@ az webapp show --resource-group "$RG_NAME" --name "$APP" --query defaultHostName
 
    Use the vault name and secret name in the reference. Leave off the version (end with a trailing slash) to always resolve the latest version. Select **Apply**.
 
-8. Under **Settings** > **Configuration** > **General settings**, set the **Startup Command** to `gunicorn --bind=0.0.0.0 --timeout 600 app:app` (leave empty for Node.js), turn **Always On** to **On**, and set the **Health check** path to `/health`. Select **Save**.
+8. Under **Settings** > **Configuration** > **General settings**, set the **Startup Command** to `gunicorn --bind=0.0.0.0 --timeout 600 app:app` (leave empty for Node.js and Java), turn **Always On** to **On**, and set the **Health check** path to `/health`. Select **Save**.
 
-9. Under **Deployment** > **Deployment Center**, connect a source (for example, **Local Git** or **GitHub**) and push your code. App Service builds and starts the app.
+9. Under **Deployment** > **Deployment Center**, connect a source (for example, **Local Git** or **GitHub**) and push your code. App Service builds and starts the app. For Java, build the JAR with `mvn -DskipTests package` and deploy `target/app.jar` (for example with `az webapp deploy --type jar`); App Service runs it with `java -jar`.
 
 10. Back on **Environment variables**, confirm the `SECRET_MESSAGE` setting shows a **Key vault Reference** source with a green resolved indicator. If it shows an error, the identity is missing the role or the reference URI is wrong - see [Troubleshooting](#troubleshooting).
 

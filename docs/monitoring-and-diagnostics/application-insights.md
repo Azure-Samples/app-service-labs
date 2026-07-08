@@ -105,14 +105,14 @@ azd auth login
 
 ### 2. Create the project structure
 
-Create a folder with the files below. The sample is Node.js; the notes explain what changes per language.
+Create a folder for the project, then choose your language for the sample app. The rest of the files (Bicep and parameters) are the same for every language.
 
 ```bash
 mkdir monitor-app-insights && cd monitor-app-insights
 mkdir infra src
 ```
 
-Create `azure.yaml` in the project root:
+Create `azure.yaml` in the project root. Set `language` to match the tab you pick below:
 
 ```yaml
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
@@ -120,11 +120,51 @@ name: monitor-app-insights
 services:
   web:
     project: ./src
-    language: js # change per language: js, dotnet, python, java
+    language: dotnet # dotnet, js, python, or java
     host: appservice
 ```
 
-Create `src/server.js` (a tiny app with a home route and a route that fails, so you have both successful and failed requests to look at):
+Create the sample app - a tiny web app with a home route and a route that fails, so you have both successful and failed requests to look at.
+
+<Tabs groupId="language" queryString>
+<TabItem value="dotnet" label=".NET">
+
+Create `src/monitor-app-insights.csproj`:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>
+```
+
+Create `src/Program.cs`:
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+// Home route - a successful request.
+app.MapGet("/", () => Results.Content(
+    "<h1>Hello from Azure App Service with Application Insights!</h1>", "text/html"));
+
+// A route that fails, so you have a failed request to look at.
+app.MapGet("/error", () => Results.Problem("Simulated failure", statusCode: 500));
+
+app.Run();
+```
+
+Set `language: dotnet` in `azure.yaml`, and in `infra/resources.bicep` (below) use `linuxFxVersion: 'DOTNETCORE|8.0'` and set `SCM_DO_BUILD_DURING_DEPLOYMENT` to `'false'` - azd builds and publishes .NET locally, so no server-side build is needed.
+
+</TabItem>
+<TabItem value="node" label="Node.js">
+
+Create `src/server.js`:
 
 ```js
 const http = require('http');
@@ -151,6 +191,15 @@ Create `src/package.json`:
   "engines": { "node": ">=20" }
 }
 ```
+
+Set `language: js` in `azure.yaml`, and keep `linuxFxVersion: 'NODE|22-lts'` with `SCM_DO_BUILD_DURING_DEPLOYMENT` set to `'true'` in the Bicep below.
+
+</TabItem>
+</Tabs>
+
+:::note Python, Java, and PHP
+This azd sample shows the two most common runtimes. For **Java**, set `language: java` and `linuxFxVersion: 'JAVA|17-java17'`, and package a JAR with Maven (see the [Deploy your first web app](../getting-started/deploy-your-first-web-app.md) lab for the Java setup). For **Python** or **PHP**, set `language` accordingly, use the matching `linuxFxVersion`, and instrument in code - see [Connect Application Insights by runtime](#connect-application-insights-by-runtime).
+:::
 
 Create `infra/main.parameters.json`:
 
@@ -285,7 +334,7 @@ output appInsightsName string = appInsights.name
 ```
 
 :::note Per-language changes
-This template uses `linuxFxVersion: 'NODE|22-lts'`. For another runtime, change that value (for example `DOTNETCORE|8.0` or `JAVA|17-java17`) and update `language` in `azure.yaml`. The `ApplicationInsightsAgent_EXTENSION_VERSION` setting enables codeless attach for .NET, Node.js, and Java. For **Python** or **PHP**, remove that setting from the Bicep (it does nothing for those runtimes) and instrument in code - see the [Connect by runtime](#connect-application-insights-by-runtime) section.
+This template uses `linuxFxVersion: 'NODE|22-lts'` with `SCM_DO_BUILD_DURING_DEPLOYMENT` set to `'true'`. For another runtime, change that value (for example `DOTNETCORE|8.0` or `JAVA|17-java17`) and update `language` in `azure.yaml`. For **.NET** and **Java**, azd builds and publishes locally, so set `SCM_DO_BUILD_DURING_DEPLOYMENT` to `'false'`. The `ApplicationInsightsAgent_EXTENSION_VERSION` setting enables codeless attach for .NET, Node.js, and Java. For **Python** or **PHP**, remove that setting from the Bicep (it does nothing for those runtimes) and instrument in code - see the [Connect by runtime](#connect-application-insights-by-runtime) section.
 :::
 
 ### 3. Create an environment and deploy

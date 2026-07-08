@@ -158,10 +158,13 @@ Create `infra/main.parameters.json`. The `planSku` parameter is what you change 
     "environmentName": { "value": "${AZURE_ENV_NAME}" },
     "location": { "value": "${AZURE_LOCATION}" },
     "resourceGroupName": { "value": "${AZURE_RESOURCE_GROUP}" },
-    "planSku": { "value": "${PLAN_SKU=B1}" }
+    "planSku": { "value": "${PLAN_SKU=B1}" },
+    "enableAutoscale": { "value": "${ENABLE_AUTOSCALE=false}" }
   }
 }
 ```
+
+The `enableAutoscale` line maps the `ENABLE_AUTOSCALE` environment value onto the Bicep parameter, so `azd env set ENABLE_AUTOSCALE true` in step 4 actually turns on the autoscale resource. Without this mapping, the parameter stays at its `false` default and autoscale is never deployed.
 
 Create `infra/main.bicep`. It runs at subscription scope so `azd` creates and owns the resource group:
 
@@ -343,14 +346,10 @@ azd env set ENABLE_AUTOSCALE true
 azd provision
 ```
 
-`azd` reads `ENABLE_AUTOSCALE` into the `enableAutoscale` parameter through the environment. If your `main.parameters.json` doesn't map it yet, add this parameter line:
-
-```json
-"enableAutoscale": { "value": "${ENABLE_AUTOSCALE=false}" }
-```
+`azd` reads `ENABLE_AUTOSCALE` into the `enableAutoscale` parameter through the mapping you added to `main.parameters.json` in step 2.
 
 :::note Bool parameters from azd environment
-`azd` environment values are strings. The Bicep `@allowed`-free `bool` parameter accepts `true`/`false` from `${ENABLE_AUTOSCALE=false}`. If you hit a type error, set the value directly in `main.parameters.json` to `true` instead of using the environment variable.
+`azd` environment values are strings. The Bicep `bool` parameter accepts `true`/`false` from `${ENABLE_AUTOSCALE=false}`. If you hit a type error, set the value directly in `main.parameters.json` to `true` instead of using the environment variable.
 :::
 
 </TabItem>
