@@ -12,12 +12,12 @@ servers.
 
 ## Labs in this section
 
-- **[Deploy your first web app](./deploy-your-first-web-app.md)** — Deploy a
+- **[Deploy your first web app](./deploy-your-first-web-app.md)** - Deploy a
   simple web app to App Service and open it in your browser. Follow the same
   path three ways (Azure Developer CLI, Azure CLI, or the Azure portal) in your
   language of choice (.NET, Node.js, Python, Java, or PHP), on Linux or Windows.
 
-- **[Deploy a custom container](./deploy-a-custom-container.md)** — Package a web
+- **[Deploy a custom container](./deploy-a-custom-container.md)** - Package a web
   app as a Docker image, push it to Azure Container Registry, and run it on App
   Service. Deploy three ways (Azure Developer CLI, Azure CLI, or the Azure
   portal) and pull the image with the app's managed identity.

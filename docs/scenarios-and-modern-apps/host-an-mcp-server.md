@@ -4,57 +4,57 @@ sidebar_position: 2
 ---
 
 {/*
-SCREENSHOT MANIFEST — capture the following and save under
+SCREENSHOT MANIFEST - capture the following and save under
 static/img/labs/host-an-mcp-server/. onBrokenLinks does not fail on missing
 images, so these paths can be filled in after authoring.
 
 1. portal-create-webapp.png
-   URL/blade: https://portal.azure.com → Create a resource → Web App → Basics tab
+   URL/blade: https://portal.azure.com > Create a resource > Web App > Basics tab
    Capture: the Basics tab with Publish = Code, Runtime stack = Node 22 LTS,
    Operating System = Linux, and a Basic B1 plan selected.
 
 2. portal-deployment-center.png
-   URL/blade: App Service → Deployment → Deployment Center
+   URL/blade: App Service > Deployment > Deployment Center
    Capture: Deployment Center configured for your source (for example, Local Git
    or GitHub) after the first successful deployment shows a green status.
 
 3. portal-overview-domain.png
-   URL/blade: App Service → Overview
+   URL/blade: App Service > Overview
    Capture: the Overview blade with the Default domain
    (for example, app-asl-mcp-xxxxxx.azurewebsites.net) highlighted.
 
 4. portal-auth-add-provider.png
-   URL/blade: App Service → Settings → Authentication → Add identity provider
+   URL/blade: App Service > Settings > Authentication > Add identity provider
    Capture: the Add an identity provider page with Identity provider = Microsoft.
 
 5. portal-auth-provider-settings.png
-   URL/blade: App Service → Settings → Authentication → Add identity provider (settings)
+   URL/blade: App Service > Settings > Authentication > Add identity provider (settings)
    Capture: App Service authentication settings showing Client secret expiration
    and the default "Require authentication" option, just before selecting Add.
 
 6. portal-auth-allowed-clients.png
-   URL/blade: App Service → Authentication → Edit identity provider → Additional checks
+   URL/blade: App Service > Authentication > Edit identity provider > Additional checks
    Capture: "Allow requests from specific client applications" selected with the
    Visual Studio Code client ID aebc6443-996d-45c2-90f0-388ff96faa56 added.
 
 7. portal-expose-api.png
-   URL/blade: Microsoft Entra ID → App registrations → (your app) → Expose an API
+   URL/blade: Microsoft Entra ID > App registrations > (your app) > Expose an API
    Capture: Authorized client applications with the VS Code client ID added and
    the user_impersonation scope checked; the full scope value
    api://<app-id>/user_impersonation visible.
 
 8. portal-app-setting-prm.png
-   URL/blade: App Service → Settings → Environment variables
+   URL/blade: App Service > Settings > Environment variables
    Capture: the new app setting WEBSITE_AUTH_PRM_DEFAULT_WITH_SCOPES with value
    api://<app-id>/user_impersonation before selecting Apply.
 
 9. vscode-mcp-signin.png
-   URL/blade: Visual Studio Code → MCP: List Servers → Start Server
+   URL/blade: Visual Studio Code > MCP: List Servers > Start Server
    Capture: the "Authenticate with Microsoft" prompt shown when the server starts,
    confirming protected resource metadata is configured correctly.
 
 10. vscode-copilot-tool-call.png
-    URL/blade: Visual Studio Code → GitHub Copilot Chat (agent mode)
+    URL/blade: Visual Studio Code > GitHub Copilot Chat (agent mode)
     Capture: Copilot Chat calling the roll_dice tool and returning a result.
 */}
 
@@ -66,7 +66,7 @@ import PathPicker from '@site/src/components/PathPicker';
 
 The [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) is how AI agents such as GitHub Copilot, Cursor, and Claude discover and call your tools. A *remote* MCP server exposes those tools over HTTP so any agent can reach them, from anywhere. That reach is exactly why security matters: an unauthenticated MCP server is an open door to whatever your tools can do.
 
-Most remote MCP servers in the wild ship that door wide open. The Apps on Azure post [*Only 8.5% of MCP Servers Use OAuth — Here's How to Host One Securely on App Service*](https://azure.github.io/AppService/) makes the point plainly: the overwhelming majority of public MCP servers have no real authorization at all. This lab shows you the secure path instead.
+Most remote MCP servers in the wild ship that door wide open. The Apps on Azure post [*Only 8.5% of MCP Servers Use OAuth - Here's How to Host One Securely on App Service*](https://azure.github.io/AppService/) makes the point plainly: the overwhelming majority of public MCP servers have no real authorization at all. This lab shows you the secure path instead.
 
 In this lab you will:
 
@@ -75,9 +75,9 @@ In this lab you will:
 - Verify the MCP endpoint responds over HTTP.
 - Secure it with **OAuth 2.0 / Microsoft Entra ID** using App Service Authentication ("Easy Auth"), and connect from Visual Studio Code.
 
-App Service is a strong home for MCP servers: managed HTTPS, built-in OAuth through Easy Auth, autoscale, and the same deployment tooling you already use for web apps. This lab **complements** the reference docs — see [App Service as Model Context Protocol (MCP) servers](https://learn.microsoft.com/azure/app-service/scenario-ai-model-context-protocol-server) for the conceptual overview.
+App Service is a strong home for MCP servers: managed HTTPS, built-in OAuth through Easy Auth, autoscale, and the same deployment tooling you already use for web apps. This lab **complements** the reference docs - see [App Service as Model Context Protocol (MCP) servers](https://learn.microsoft.com/azure/app-service/scenario-ai-model-context-protocol-server) for the conceptual overview.
 
-**Estimated time:** 30–45 minutes.
+**Estimated time:** 30 to 45 minutes.
 
 ## Objectives
 
@@ -109,7 +109,7 @@ azd auth login
 
 An MCP server built on the current spec speaks **Streamable HTTP**: the client sends JSON-RPC messages to a single endpoint (here, `/mcp`) with `POST`, and the server can stream responses back as Server-Sent Events (SSE) on the same connection.
 
-Early MCP servers kept a session in memory and pinned each client to one process. That works on a single instance but breaks the moment you scale out — a request can land on any instance. The Apps on Azure post [*MCP Just Went Stateless — What the 2026 Spec Changes About Scaling on App Service*](https://azure.github.io/AppService/) describes the shift: the protocol now supports fully stateless operation, where the server holds **no** per-client session state between requests. Any instance can serve any request, so App Service [scale out](https://learn.microsoft.com/azure/app-service/manage-scale-up) just works.
+Early MCP servers kept a session in memory and pinned each client to one process. That works on a single instance but breaks the moment you scale out - a request can land on any instance. The Apps on Azure post [*MCP Just Went Stateless - What the 2026 Spec Changes About Scaling on App Service*](https://azure.github.io/AppService/) describes the shift: the protocol now supports fully stateless operation, where the server holds **no** per-client session state between requests. Any instance can serve any request, so App Service [scale out](https://learn.microsoft.com/azure/app-service/manage-scale-up) just works.
 
 ```mermaid
 flowchart LR
@@ -291,7 +291,7 @@ curl http://localhost:3000/health
 ```
 
 :::tip Windows vs Linux
-The Node.js sample runs on both **Windows** and **Linux** App Service plans. The Python variant below is **Linux only** — Python is not a built-in Windows App Service stack.
+The Node.js sample runs on both **Windows** and **Linux** App Service plans. The Python variant below is **Linux only** - Python is not a built-in Windows App Service stack.
 :::
 
 </TabItem>
@@ -499,7 +499,7 @@ SUCCESS: Your application was deployed to Azure in 5 minutes 48 seconds.
 ```
 
 :::note First deploy
-On the very first `azd up`, azd occasionally reports it can't find the tagged resource because provisioning outputs aren't cached yet. If that happens, simply run `azd deploy` once more — the resources already exist and the code deploy completes.
+On the very first `azd up`, azd occasionally reports it can't find the tagged resource because provisioning outputs aren't cached yet. If that happens, simply run `azd deploy` once more - the resources already exist and the code deploy completes.
 :::
 
 </TabItem>
@@ -540,7 +540,7 @@ az webapp deploy --resource-group "$RG" --name "$APP" --src-path app.zip --type 
 ```
 
 :::note Deploy timeout
-The remote build can take a few minutes. If `az webapp deploy` returns a `504 GatewayTimeout`, the build is usually still finishing — wait a minute and check the endpoint. It succeeds even when the client-side poll times out.
+The remote build can take a few minutes. If `az webapp deploy` returns a `504 GatewayTimeout`, the build is usually still finishing - wait a minute and check the endpoint. It succeeds even when the client-side poll times out.
 :::
 
 For the Python variant, use `--runtime "PYTHON|3.12"`, set `--startup-file "python app.py"`, and zip `app.py requirements.txt`.
@@ -587,7 +587,7 @@ export APP_URL="https://app-asl-mcp-xxxxxx.azurewebsites.net"
 # 1) Health check
 curl -i "$APP_URL/health"
 
-# 2) MCP initialize — the core protocol handshake
+# 2) MCP initialize - the core protocol handshake
 curl -s -X POST "$APP_URL/mcp" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
@@ -623,7 +623,7 @@ Right now the endpoint is open. App Service Authentication ("Easy Auth") adds an
 Enabling a Microsoft identity provider **creates a Microsoft Entra ID app registration** and may require administrator consent in your tenant. The app-registration and consent steps below are marked **[Manual / admin]**. If you can't create app registrations, ask an administrator to complete them. This lab live-tested only the App Service hosting and endpoint reachability; the app-registration and consent flow must be verified in your own tenant.
 :::
 
-### Step 1 — Enable Microsoft Entra authentication  **[Manual / admin]**
+### Step 1 - Enable Microsoft Entra authentication  **[Manual / admin]**
 
 1. In the portal, go to your App Service app > **Settings** > **Authentication** > **Add identity provider**.
 2. Select **Microsoft** as the identity provider.
@@ -634,7 +634,7 @@ Enabling a Microsoft identity provider **creates a Microsoft Entra ID app regist
 
 ![Identity provider settings](/img/labs/host-an-mcp-server/portal-auth-provider-settings.png)
 
-### Step 2 — Allow the Visual Studio Code client  **[Manual / admin]**
+### Step 2 - Allow the Visual Studio Code client  **[Manual / admin]**
 
 1. On the **Authentication** page, select **Edit** (pencil) next to the Microsoft provider.
 2. Under **Additional checks** > **Client application requirement**, select **Allow requests from specific client applications**.
@@ -643,7 +643,7 @@ Enabling a Microsoft identity provider **creates a Microsoft Entra ID app regist
 
 ![Allowed client applications](/img/labs/host-an-mcp-server/portal-auth-allowed-clients.png)
 
-### Step 3 — Expose the API to Visual Studio Code  **[Manual / admin]**
+### Step 3 - Expose the API to Visual Studio Code  **[Manual / admin]**
 
 1. On the **Authentication** page, select the Microsoft provider to open its app registration.
 2. Select **Manage** > **Expose an API**.
@@ -653,7 +653,7 @@ Enabling a Microsoft identity provider **creates a Microsoft Entra ID app regist
 
 ![Expose an API](/img/labs/host-an-mcp-server/portal-expose-api.png)
 
-### Step 4 — Publish protected resource metadata
+### Step 4 - Publish protected resource metadata
 
 Setting the authorization scope in an app setting turns on the `/.well-known/oauth-protected-resource` endpoint, which is how MCP clients discover your authorization requirements.
 
@@ -670,7 +670,7 @@ az webapp config appsettings set --resource-group "$RG" --name "$APP" \
   --settings WEBSITE_AUTH_PRM_DEFAULT_WITH_SCOPES="api://<app-registration-app-id>/user_impersonation"
 ```
 
-### Step 5 — Connect from Visual Studio Code
+### Step 5 - Connect from Visual Studio Code
 
 1. In your workspace, create `.vscode/mcp.json`:
 
@@ -718,7 +718,7 @@ azd down --force --purge
 
 ## Summary
 
-You built a stateless MCP server, deployed it to Azure App Service with azd, the Azure CLI, and the portal, and confirmed the `/mcp` endpoint answered an `initialize` request over HTTPS. You then secured it with OAuth 2.0 / Microsoft Entra ID using Easy Auth and protected resource metadata, so MCP clients like Visual Studio Code sign in before calling your tools. The stateless design means you can scale the app out on App Service without pinning clients to a single instance — the shift that makes remote MCP servers production-ready.
+You built a stateless MCP server, deployed it to Azure App Service with azd, the Azure CLI, and the portal, and confirmed the `/mcp` endpoint answered an `initialize` request over HTTPS. You then secured it with OAuth 2.0 / Microsoft Entra ID using Easy Auth and protected resource metadata, so MCP clients like Visual Studio Code sign in before calling your tools. The stateless design means you can scale the app out on App Service without pinning clients to a single instance - the shift that makes remote MCP servers production-ready.
 
 ## Learn more
 
@@ -729,5 +729,5 @@ You built a stateless MCP server, deployed it to Azure App Service with azd, the
 - [Configure a Node.js app for App Service](https://learn.microsoft.com/azure/app-service/configure-language-nodejs)
 - [Scale up an app in App Service](https://learn.microsoft.com/azure/app-service/manage-scale-up)
 - [Model Context Protocol specification](https://modelcontextprotocol.io/specification)
-- Apps on Azure blog: [*Only 8.5% of MCP Servers Use OAuth — Here's How to Host One Securely on App Service*](https://azure.github.io/AppService/) and [*MCP Just Went Stateless — What the 2026 Spec Changes About Scaling on App Service*](https://azure.github.io/AppService/)
+- Apps on Azure blog: [*Only 8.5% of MCP Servers Use OAuth - Here's How to Host One Securely on App Service*](https://azure.github.io/AppService/) and [*MCP Just Went Stateless - What the 2026 Spec Changes About Scaling on App Service*](https://azure.github.io/AppService/)
 - Back to the [Scenarios & Modern Apps overview](./overview.md)

@@ -4,42 +4,42 @@ sidebar_position: 3
 ---
 
 {/*
-SCREENSHOT MANIFEST — capture the following and save under
+SCREENSHOT MANIFEST - capture the following and save under
 static/img/labs/deploy-an-ai-app/. Lightweight placeholder PNGs are committed
 so the build passes; replace them with real captures. Do NOT fabricate these.
 
 1. portal-create-openai.png
-   URL/blade: https://portal.azure.com → Create a resource → Azure OpenAI → Basics tab
+   URL/blade: https://portal.azure.com > Create a resource > Azure OpenAI > Basics tab
    Capture: the Basics tab with Region = East US, a unique Name (for example
    aoai-asl-xxxxxx), and the Standard S0 pricing tier selected.
 
 2. portal-deploy-model.png
-   URL/blade: Azure AI Foundry portal (ai.azure.com) → your resource → Deployments → Deploy model
+   URL/blade: Azure AI Foundry portal (ai.azure.com) > your resource > Deployments > Deploy model
    Capture: the Deploy model dialog with Model = gpt-4o, a deployment name of
    gpt-4o, and Deployment type = Standard, just before selecting Deploy.
 
 3. portal-create-webapp.png
-   URL/blade: https://portal.azure.com → Create a resource → Web App → Basics tab
+   URL/blade: https://portal.azure.com > Create a resource > Web App > Basics tab
    Capture: the Basics tab with Publish = Code, Runtime stack = Python 3.12
    (or Node 22 LTS), Operating System = Linux, and a Basic B1 plan selected.
 
 4. portal-identity-on.png
-   URL/blade: App Service → Settings → Identity → System assigned
+   URL/blade: App Service > Settings > Identity > System assigned
    Capture: the System assigned tab with Status set to On and an Object
    (principal) ID visible after saving.
 
 5. portal-add-role-assignment.png
-   URL/blade: Azure OpenAI resource → Access control (IAM) → Add role assignment
+   URL/blade: Azure OpenAI resource > Access control (IAM) > Add role assignment
    Capture: the Add role assignment flow with Role = Cognitive Services OpenAI
    User and the web app's managed identity selected as the member.
 
 6. portal-app-settings.png
-   URL/blade: App Service → Settings → Environment variables → App settings
+   URL/blade: App Service > Settings > Environment variables > App settings
    Capture: the app settings list showing AZURE_OPENAI_ENDPOINT,
    AZURE_OPENAI_DEPLOYMENT, and AZURE_OPENAI_API_VERSION before selecting Apply.
 
 7. portal-overview-domain.png
-   URL/blade: App Service → Overview
+   URL/blade: App Service > Overview
    Capture: the Overview blade with the Default domain
    (for example, app-asl-aiapp-xxxxxx.azurewebsites.net) highlighted.
 
@@ -55,7 +55,7 @@ import PathPicker from '@site/src/components/PathPicker';
 
 # Build and deploy an AI-powered app
 
-Adding AI to a web app usually means calling a large language model from your code. The tempting shortcut is to paste an API key into an app setting — but keys leak, expire, and end up in source control. This lab shows the recommended path instead: a web app on [Azure App Service](https://learn.microsoft.com/azure/app-service/overview) that calls an [Azure OpenAI](https://learn.microsoft.com/azure/ai-services/openai/overview) model using a **managed identity**, so there are no keys in your code or configuration at all.
+Adding AI to a web app usually means calling a large language model from your code. The tempting shortcut is to paste an API key into an app setting - but keys leak, expire, and end up in source control. This lab shows the recommended path instead: a web app on [Azure App Service](https://learn.microsoft.com/azure/app-service/overview) that calls an [Azure OpenAI](https://learn.microsoft.com/azure/ai-services/openai/overview) model using a **managed identity**, so there are no keys in your code or configuration at all.
 
 In this lab you will:
 
@@ -63,11 +63,11 @@ In this lab you will:
 - Provision Azure OpenAI and deploy a `gpt-4o` model.
 - Deploy the app to App Service three ways: **Azure Developer CLI (azd)**, **Azure CLI (az)**, and the **Azure portal**.
 - Wire up **keyless** authentication: turn on the app's managed identity and grant it the **Cognitive Services OpenAI User** role.
-- Verify a real AI completion returns over HTTPS — with no API key anywhere.
+- Verify a real AI completion returns over HTTPS - with no API key anywhere.
 
-App Service is a strong home for AI apps: managed HTTPS, built-in managed identity, autoscale, and the same deployment tooling you already use for web apps. This lab **complements** the reference docs — see [Tutorial: Build a web app with Azure OpenAI on App Service](https://learn.microsoft.com/azure/app-service/) for the conceptual overview.
+App Service is a strong home for AI apps: managed HTTPS, built-in managed identity, autoscale, and the same deployment tooling you already use for web apps. This lab **complements** the reference docs - see [Tutorial: Build a web app with Azure OpenAI on App Service](https://learn.microsoft.com/azure/app-service/) for the conceptual overview.
 
-**Estimated time:** 30–45 minutes.
+**Estimated time:** 30 to 45 minutes.
 
 ## Objectives
 
@@ -101,7 +101,7 @@ This lab uses the **East US** region and the **B1 (Basic)** App Service tier, a 
 
 ## Why keyless, and how it works
 
-An Azure OpenAI resource accepts two kinds of authentication: an **API key** or a **Microsoft Entra ID token**. Keys are simple but risky — anyone who reads the key can call your model, and rotating a leaked key means redeploying every app that uses it. A **managed identity** removes the key entirely: App Service gives your app an identity in Microsoft Entra ID, you grant that identity a role on the Azure OpenAI resource, and the Azure SDK fetches short-lived tokens automatically at runtime.
+An Azure OpenAI resource accepts two kinds of authentication: an **API key** or a **Microsoft Entra ID token**. Keys are simple but risky - anyone who reads the key can call your model, and rotating a leaked key means redeploying every app that uses it. A **managed identity** removes the key entirely: App Service gives your app an identity in Microsoft Entra ID, you grant that identity a role on the Azure OpenAI resource, and the Azure SDK fetches short-lived tokens automatically at runtime.
 
 ```mermaid
 flowchart LR
@@ -112,12 +112,12 @@ flowchart LR
   AOAI -->|4 - completion| APP
 ```
 
-In code, this is the `DefaultAzureCredential` from the Azure Identity library. Locally it uses your `az login` session; on App Service it uses the app's managed identity — the same code, no keys, in both places.
+In code, this is the `DefaultAzureCredential` from the Azure Identity library. Locally it uses your `az login` session; on App Service it uses the app's managed identity - the same code, no keys, in both places.
 
 ## The app sample
 
 <PathPicker
-  description="Set these once — the sample code and every deployment step below follow your choice."
+  description="Set these once - the sample code and every deployment step below follow your choice."
   groups={[
     { id: 'lang', label: 'Language', options: [
       { value: 'python', label: 'Python' },
@@ -324,7 +324,7 @@ The Node.js sample runs on both **Windows** and **Linux** App Service plans. The
 </TabItem>
 <TabItem value="dotnet" label=".NET">
 
-The deployment steps are identical — only the keyless client setup differs. Add the [`Azure.AI.OpenAI`](https://www.nuget.org/packages/Azure.AI.OpenAI) and [`Azure.Identity`](https://www.nuget.org/packages/Azure.Identity) packages, then build the client with `DefaultAzureCredential`:
+The deployment steps are identical - only the keyless client setup differs. Add the [`Azure.AI.OpenAI`](https://www.nuget.org/packages/Azure.AI.OpenAI) and [`Azure.Identity`](https://www.nuget.org/packages/Azure.Identity) packages, then build the client with `DefaultAzureCredential`:
 
 ```csharp
 using Azure.AI.OpenAI;
@@ -458,7 +458,7 @@ Choose one deployment mechanism. All three create a Linux App Service on a low-c
 <Tabs groupId="deploy" queryString>
 <TabItem value="azd" label="Azure Developer CLI (azd)">
 
-The Azure Developer CLI provisions everything — Azure OpenAI, the model deployment, the App Service, the managed identity, and the role assignment — then deploys your code in one step. Add these files to your project.
+The Azure Developer CLI provisions everything - Azure OpenAI, the model deployment, the App Service, the managed identity, and the role assignment - then deploys your code in one step. Add these files to your project.
 
 `azure.yaml`
 
@@ -627,10 +627,10 @@ Endpoint: https://app-asl-aiapp-xxxxxx.azurewebsites.net/
 SUCCESS: Your application was deployed to Azure in 6 minutes 12 seconds.
 ```
 
-Because the role assignment is in the Bicep, the keyless call works as soon as the app starts — no extra steps.
+Because the role assignment is in the Bicep, the keyless call works as soon as the app starts - no extra steps.
 
 :::note First deploy
-On the very first `azd up`, azd occasionally reports it can't find the tagged resource because provisioning outputs aren't cached yet. If that happens, run `azd deploy` once more — the resources already exist and the code deploy completes.
+On the very first `azd up`, azd occasionally reports it can't find the tagged resource because provisioning outputs aren't cached yet. If that happens, run `azd deploy` once more - the resources already exist and the code deploy completes.
 :::
 
 Skip to [Verify the app](#verify-the-app).
@@ -688,7 +688,7 @@ az webapp deploy --resource-group "$RG" --name "$APP" --src-path app.zip --type 
 For the Node.js variant, use `--runtime "NODE:22-lts"`, leave the startup command empty (App Service runs `npm start`), and zip `server.js package.json`.
 
 :::note Deploy timeout
-The remote build can take a few minutes. If `az webapp deploy` returns a `504 GatewayTimeout`, the build is usually still finishing — wait a minute and check the endpoint. It succeeds even when the client-side poll times out.
+The remote build can take a few minutes. If `az webapp deploy` returns a `504 GatewayTimeout`, the build is usually still finishing - wait a minute and check the endpoint. It succeeds even when the client-side poll times out.
 :::
 
 Get the hostname:
@@ -746,7 +746,7 @@ export APP_URL="https://app-asl-aiapp-xxxxxx.azurewebsites.net"
 # 1) Health check
 curl -i "$APP_URL/health"
 
-# 2) Keyless AI call — no API key in the request
+# 2) Keyless AI call - no API key in the request
 curl -s -X POST "$APP_URL/chat" \
   -H "Content-Type: application/json" \
   -d '{"prompt":"In one short sentence, say hello from Azure App Service using a keyless managed identity."}'
@@ -763,7 +763,7 @@ HTTP/1.1 200 OK
 {"reply":"\"Hello from Azure App Service using a keyless managed identity!\""}
 ```
 
-A `200` with a `reply` payload confirms the app reached Azure OpenAI **without any key** — the managed identity fetched a token and the `Cognitive Services OpenAI User` role authorized the call.
+A `200` with a `reply` payload confirms the app reached Azure OpenAI **without any key** - the managed identity fetched a token and the `Cognitive Services OpenAI User` role authorized the call.
 
 ![The keyless chat response](/img/labs/deploy-an-ai-app/portal-test-response.png)
 
@@ -797,7 +797,7 @@ Azure OpenAI accounts are soft-deleted and still count against your regional quo
 
 ## Summary
 
-You built a small AI web app, provisioned Azure OpenAI with a `gpt-4o` deployment, and deployed the app to Azure App Service with azd, the Azure CLI, and the portal. Instead of storing an API key, you turned on the app's managed identity and granted it the **Cognitive Services OpenAI User** role, then confirmed a real completion returned over HTTPS with no key anywhere in your code or configuration. This keyless pattern is the recommended way to reach Azure OpenAI — and the same `DefaultAzureCredential` code works locally and in the cloud, so there's nothing to change between environments.
+You built a small AI web app, provisioned Azure OpenAI with a `gpt-4o` deployment, and deployed the app to Azure App Service with azd, the Azure CLI, and the portal. Instead of storing an API key, you turned on the app's managed identity and granted it the **Cognitive Services OpenAI User** role, then confirmed a real completion returned over HTTPS with no key anywhere in your code or configuration. This keyless pattern is the recommended way to reach Azure OpenAI - and the same `DefaultAzureCredential` code works locally and in the cloud, so there's nothing to change between environments.
 
 ## Troubleshooting
 
