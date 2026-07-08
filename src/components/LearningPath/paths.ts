@@ -119,6 +119,37 @@ export const paths: Record<string, LearningPathDef> = {
       },
     ],
   },
+  'govern-multi-agent-ai': {
+    title: 'Build, observe, and govern multi-agent AI',
+    tagline:
+      'Carry one multi-agent AI app - a six-agent travel planner - from a first deploy to a fully observable and policy-governed app on App Service.',
+    steps: [
+      {
+        title: 'Deploy the multi-agent app',
+        summary: 'Deploy the six-agent travel planner to App Service with the Azure Developer CLI.',
+        category: 'Scenarios & modern apps',
+        time: '30-40 min',
+        to: '/docs/learning-paths/govern-multi-agent-ai/deploy-the-agents',
+        status: 'available',
+      },
+      {
+        title: 'Observe the agents',
+        summary: 'Trace every agent, token, and tool call in the Application Insights Agents view.',
+        category: 'Monitoring & diagnostics',
+        time: '20-30 min',
+        to: '/docs/learning-paths/govern-multi-agent-ai/observe-the-agents',
+        status: 'available',
+      },
+      {
+        title: 'Govern the agents',
+        summary: 'Enforce policies on agent tool calls with the Agent Governance Toolkit.',
+        category: 'Security & identity',
+        time: '30-40 min',
+        to: '/docs/learning-paths/govern-multi-agent-ai/govern-the-agents',
+        status: 'available',
+      },
+    ],
+  },
 };
 
 export function getPath(pathId: string): LearningPathDef | undefined {
@@ -159,6 +190,18 @@ export const catalog: LearningPathSummary[] = [
     steps: 11,
     time: '4-6 hours',
     to: '/docs/learning-paths/enterprise-web-app',
+    status: 'available',
+  },
+  {
+    id: 'govern-multi-agent-ai',
+    title: 'Govern multi-agent AI',
+    description:
+      'Build, observe, and govern a multi-agent AI app on App Service. Deploy a six-agent travel planner built with the Microsoft Agent Framework, trace every agent and token in the Application Insights Agents view, then enforce tool-call policies with the Agent Governance Toolkit.',
+    icon: '🛡️',
+    level: 'Advanced',
+    steps: 3,
+    time: '2-3 hours',
+    to: '/docs/learning-paths/govern-multi-agent-ai',
     status: 'available',
   },
   {
