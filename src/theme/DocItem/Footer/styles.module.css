@@ -1,0 +1,14 @@
+/* Right-align the edit-meta right column contents (feedback link, and last
+ * updated info when present) on desktop, matching the stock last-updated
+ * alignment. On narrow screens it stacks and left-aligns like the rest. */
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+@media (min-width: 997px) {
+  .right {
+    align-items: flex-end;
+  }
+}
