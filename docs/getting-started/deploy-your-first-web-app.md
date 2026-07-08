@@ -268,6 +268,10 @@ dotnet new webapp
 cd ..
 ```
 
+:::note Turn off server-side build for .NET
+`azd` builds and publishes the .NET app locally with `dotnet publish`, then deploys the compiled output. Server-side build would try to compile that output again and fail, so for the .NET variant change the `SCM_DO_BUILD_DURING_DEPLOYMENT` value in `infra/resources.bicep` to `'false'`. Leave it `'true'` for Node.js and Python, which deploy source that App Service builds.
+:::
+
 </TabItem>
 
 <TabItem value="node" label="Node.js">
