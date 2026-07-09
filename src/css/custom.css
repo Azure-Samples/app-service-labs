@@ -4,9 +4,17 @@
  * work well for content-centric websites.
  */
 
+/* Self-hosted heading font (Space Grotesk, variable, latin subset). */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('../fonts/space-grotesk.woff2') format('woff2');
+}
+
 /* You can override the default Infima variables here. */
 :root {
-
   --ifm-color-primary: #0078d4;
   --ifm-color-primary-dark: #006cbf;
   --ifm-color-primary-darker: #0066b4;
@@ -19,6 +27,16 @@
 
   /* App Service accent (brand blue), used for highlighted text. */
   --as-accent: #0078d4;
+
+  /* Secondary coral accent - ties to the homepage hero art and sets the
+     site apart from the all-blue default. */
+  --as-coral: #ff6a5e;
+  --as-coral-dark: #f2564a;
+  --as-coral-soft: rgba(255, 106, 94, 0.12);
+
+  /* Distinctive heading typeface for a bespoke feel. */
+  --ifm-heading-font-family: 'Space Grotesk', var(--ifm-font-family-base);
+  --ifm-heading-font-weight: 600;
 }
 
 /* For readability concerns, a slightly brighter blue is used in dark mode. */
@@ -33,4 +51,75 @@
   --docusaurus-highlighted-code-line-bg: rgba(63, 157, 236, 0.15);
 
   --as-accent: #5ea0ef;
+
+  --as-coral: #ff8078;
+  --as-coral-dark: #ff6a5e;
+  --as-coral-soft: rgba(255, 128, 120, 0.16);
+}
+
+/* --- Coral accent touches ------------------------------------------------ */
+
+/* Underline links on hover with the coral accent so body links feel branded. */
+.markdown a:not(.card):hover,
+article a:not(.card):hover {
+  text-decoration-color: var(--as-coral);
+  text-decoration-thickness: 2px;
+}
+
+/* Primary buttons keep Azure blue; give the secondary/outline button the coral. */
+.button--secondary {
+  --ifm-button-border-color: var(--as-coral);
+  color: var(--as-coral-dark);
+}
+.button--secondary:hover {
+  background-color: var(--as-coral);
+  border-color: var(--as-coral);
+  color: #fff;
+}
+
+/* Active navbar link gets a coral underline. */
+.navbar__link {
+  position: relative;
+}
+.navbar__link--active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  background: var(--as-coral);
+  border-radius: 2px;
+}
+
+/* Subtle blur + border under the navbar. */
+.navbar {
+  backdrop-filter: saturate(140%) blur(6px);
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+/* --- Admonitions: brand the "tip" callout with coral --------------------- */
+.theme-admonition-tip {
+  --ifm-color-success: var(--as-coral);
+  --ifm-color-success-dark: var(--as-coral-dark);
+  --ifm-color-success-contrast-background: var(--as-coral-soft);
+  --ifm-color-success-contrast-foreground: var(--as-coral-dark);
+}
+
+/* --- Doc cards: rounder corners and a lift on hover --------------------- */
+article .card {
+  border-radius: 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+article a.card:hover {
+  border-color: var(--as-coral);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* --- Headings: a touch tighter tracking for the geometric font ---------- */
+h1,
+h2,
+h3 {
+  letter-spacing: -0.01em;
 }

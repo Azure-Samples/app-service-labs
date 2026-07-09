@@ -3,7 +3,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 
 import LandingpageFeatures from '../components/LandingpageFeatures';
-import UnderConstruction from '../components/UnderConstruction';
+import HomepageSections from '../components/HomepageSections';
 
 const imageUrls = [
   './img/hero-deploy.png',
@@ -19,12 +19,7 @@ export default function Home(): ReactNode {
       description="Hands-on tutorials and workshops for building, deploying, and operating apps on Azure App Service.">
       <main>
         <LandingpageFeatures images={imageUrls} />
-        <div className="container margin-bottom--xl">
-          <UnderConstruction title="App Service Labs is under construction">
-            This site is being built out for Azure App Service. Content and
-            workshops are on the way &mdash; check back soon!
-          </UnderConstruction>
-        </div>
+        <HomepageSections />
       </main>
     </Layout>
   );

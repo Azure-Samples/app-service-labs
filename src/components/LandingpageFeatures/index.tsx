@@ -21,7 +21,7 @@ const keywords = [
 
 export default function LandingpageFeatures({ images }: LandingpageFeaturesProps): ReactNode {
     return (
-        //<section className={styles.largetext}>    
+        <div className={styles.heroWrap}>
             <div className='container no-sidebar'>
                 <div className="row">
                    <img className={styles.logo} src={useBaseUrl('/img/app-service-labs-logo.svg')}  alt="App Service Labs logo"  />
@@ -56,6 +56,6 @@ export default function LandingpageFeatures({ images }: LandingpageFeaturesProps
                     </div>
                 </div>
             </div>
-        //</section>
+        </div>
     )
 }
