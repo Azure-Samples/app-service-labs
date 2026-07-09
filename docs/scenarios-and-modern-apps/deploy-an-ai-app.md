@@ -1,5 +1,6 @@
 ---
 title: Build and deploy an AI-powered app
+description: "Build a web app on App Service that calls an Azure OpenAI model with a managed identity, so there are no API keys in your code or config."
 sidebar_position: 3
 ---
 

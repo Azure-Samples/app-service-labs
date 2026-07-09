@@ -1,5 +1,6 @@
 ---
 title: Overview
+description: "Our flagship track: scenario-driven labs that build and run modern apps on Azure App Service."
 sidebar_position: 1
 ---
 

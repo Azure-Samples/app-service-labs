@@ -1,5 +1,6 @@
 ---
 title: "Step 10: Isolate the backend with private networking"
+description: "Step 10: Isolate the backend with private networking and private endpoints."
 sidebar_position: 11
 ---
 

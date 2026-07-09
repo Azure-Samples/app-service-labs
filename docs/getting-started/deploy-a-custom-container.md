@@ -1,5 +1,6 @@
 ---
 title: Deploy a custom container
+description: "Package a web app as a container image, push it to Azure Container Registry, and run it on App Service with Web App for Containers."
 sidebar_position: 3
 ---
 

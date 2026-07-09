@@ -1,5 +1,6 @@
 ---
 title: "Step 11: Automate delivery with GitHub Actions"
+description: "Step 11: Automate build and deployment with a GitHub Actions pipeline."
 sidebar_position: 12
 ---
 

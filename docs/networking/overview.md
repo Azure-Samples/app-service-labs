@@ -1,5 +1,6 @@
 ---
 title: Overview
+description: "Connect Azure App Service to your virtual networks and lock down inbound and outbound traffic."
 sidebar_position: 1
 ---
 

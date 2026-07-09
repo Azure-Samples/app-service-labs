@@ -1,5 +1,6 @@
 ---
 title: "Step 1: Deploy the multi-agent app"
+description: "Step 1: Deploy the multi-agent AI app to Azure App Service."
 sidebar_position: 2
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: Overview
+description: "New to Azure App Service? Start here with hands-on labs that deploy and manage your first apps."
 sidebar_position: 1
 ---
 

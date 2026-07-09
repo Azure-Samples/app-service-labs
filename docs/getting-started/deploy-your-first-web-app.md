@@ -1,5 +1,6 @@
 ---
 title: Deploy your first web app
+description: "Deploy a simple web app to Azure App Service and open it in your browser, with no servers to manage."
 sidebar_position: 2
 ---
 

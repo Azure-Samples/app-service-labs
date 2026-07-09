@@ -1,5 +1,6 @@
 ---
 title: Overview
+description: "Size and scale apps on Azure App Service: pricing tiers, scale up, scale out, and autoscale."
 sidebar_position: 1
 ---
 

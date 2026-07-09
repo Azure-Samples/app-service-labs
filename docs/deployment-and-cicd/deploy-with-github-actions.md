@@ -1,5 +1,6 @@
 ---
 title: Deploy to App Service with GitHub Actions
+description: "Set up continuous deployment from GitHub to Azure App Service with GitHub Actions, so every push to main deploys automatically."
 sidebar_position: 2
 ---
 

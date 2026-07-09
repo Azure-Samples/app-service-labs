@@ -117,6 +117,21 @@ article a.card:hover {
   transform: translateY(-2px);
 }
 
+/* Show the full card title and a multi-line description on generated category
+   index pages instead of the default single-line truncation. */
+.theme-doc-card-title.text--truncate {
+  white-space: normal;
+  overflow: visible;
+}
+.theme-doc-card-description.text--truncate {
+  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
 /* --- Headings: a touch tighter tracking for the geometric font ---------- */
 h1,
 h2,

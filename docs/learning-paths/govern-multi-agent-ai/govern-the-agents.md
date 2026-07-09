@@ -1,5 +1,6 @@
 ---
 title: "Step 3: Govern the agents"
+description: "Step 3: Govern the agents with guardrails and policy controls."
 sidebar_position: 4
 ---
 

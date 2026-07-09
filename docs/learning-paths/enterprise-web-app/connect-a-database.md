@@ -1,5 +1,6 @@
 ---
 title: "Step 3: Connect a database with managed identity"
+description: "Step 3: Connect your app to a database using a managed identity instead of a password in the connection string."
 sidebar_position: 4
 ---
 

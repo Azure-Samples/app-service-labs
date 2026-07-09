@@ -28,8 +28,38 @@
 
 .img450x450 {
     width: 450px;
-    height: 450px;
+    max-width: 100%;
     margin-left: .25rem;
+}
+
+/* Frame the hero illustration as a rounded card so its light background
+   reads as an intentional panel instead of a raw rectangle. */
+.img450x450 img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    border: 1px solid var(--ifm-color-emphasis-200);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10);
+}
+
+/* In dark mode, sit the illustration on a soft brand-tinted matte with a
+   glowing edge, so the light image floats as a card rather than clashing
+   with the dark page. */
+:global([data-theme='dark']) .img450x450 {
+    padding: 14px;
+    border-radius: 24px;
+    background:
+        radial-gradient(120% 120% at 0% 0%, rgba(0, 120, 212, 0.16), transparent 60%),
+        radial-gradient(120% 120% at 100% 100%, rgba(255, 106, 94, 0.16), transparent 60%),
+        rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+:global([data-theme='dark']) .img450x450 img {
+    border-color: rgba(255, 255, 255, 0.10);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 .margin-md-left {

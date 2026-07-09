@@ -1,5 +1,6 @@
 ---
 title: Overview
+description: "Configure App Service apps: app settings, connection strings, startup commands, custom domains, and certificates."
 sidebar_position: 1
 ---
 

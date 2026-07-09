@@ -1,5 +1,6 @@
 ---
 title: "Step 2: Externalize configuration"
+description: "Step 2: Move configuration out of code into Azure App Service app settings."
 sidebar_position: 3
 ---
 

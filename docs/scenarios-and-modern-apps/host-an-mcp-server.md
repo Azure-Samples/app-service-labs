@@ -1,5 +1,6 @@
 ---
 title: Host an MCP server on Azure App Service, secured with OAuth
+description: "Host a remote MCP server on Azure App Service and secure it with OAuth so only authorized AI agents can call your tools."
 sidebar_position: 2
 ---
 

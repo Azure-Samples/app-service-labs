@@ -1,5 +1,6 @@
 ---
 title: "Step 6: Scale out with autoscale"
+description: "Step 6: Scale the app out automatically with Azure App Service autoscale rules."
 sidebar_position: 7
 ---
 

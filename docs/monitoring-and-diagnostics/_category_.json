@@ -3,6 +3,6 @@
   "position": 9,
   "link": {
     "type": "generated-index",
-    "description": "Observe, log, and troubleshoot your app. Under construction."
+    "description": "Observe, log, and troubleshoot your app with Application Insights, App Service logs, and alerts."
   }
 }
