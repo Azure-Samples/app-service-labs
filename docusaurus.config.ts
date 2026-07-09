@@ -159,51 +159,59 @@ const config: Config = {
     footer: {
       style: 'dark',
       links: [
-        // {
-        //   title: 'Docs',
-        //   items: [
-        //     {
-        //       label: 'Tutorial',
-        //       to: '/docs/intro',
-        //     },
-        //   ],
-        // },
-        // {
-        //   title: 'Community',
-        //   items: [
-        //     {
-        //       label: 'Stack Overflow',
-        //       href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-        //     },
-        //     {
-        //       label: 'Discord',
-        //       href: 'https://discordapp.com/invite/docusaurus',
-        //     },
-        //     {
-        //       label: 'X',
-        //       href: 'https://x.com/docusaurus',
-        //     },
-        //   ],
-        // },
-        // {
-        //   title: 'More',
-        //   items: [
-        //     {
-        //       label: 'Blog',
-        //       to: '/blog',
-        //     },
-        //     {
-        //       label: 'GitHub',
-        //       href: 'https://github.com/facebook/docusaurus',
-        //     },
-        //   ],
-        // },
+        {
+          title: 'Learn',
+          items: [
+            {
+              label: 'Workshops',
+              to: '/docs/intro',
+            },
+            {
+              label: 'Learning paths',
+              to: '/docs/learning-paths/overview',
+            },
+            {
+              label: 'Contribute a lab',
+              to: '/contributing',
+            },
+          ],
+        },
+        {
+          title: 'Azure App Service',
+          items: [
+            {
+              label: 'Documentation',
+              href: 'https://learn.microsoft.com/azure/app-service/',
+            },
+            {
+              label: 'App Service blog',
+              href: 'https://azure.github.io/AppService/',
+            },
+            {
+              label: 'Azure portal',
+              href: 'https://portal.azure.com/',
+            },
+          ],
+        },
+        {
+          title: 'Community',
+          items: [
+            {
+              label: 'GitHub',
+              href: 'https://github.com/Azure-Samples/app-service-labs',
+            },
+            {
+              label: 'Report an issue',
+              href: 'https://github.com/Azure-Samples/app-service-labs/issues/new',
+            },
+          ],
+        },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Microsoft. Built with Docusaurus.`,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismThemes.oneLight,
+      darkTheme: prismThemes.oneDark,
     },
   } satisfies Preset.ThemeConfig,
 };
