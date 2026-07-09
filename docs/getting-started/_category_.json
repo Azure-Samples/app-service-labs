@@ -3,6 +3,6 @@
   "position": 2,
   "link": {
     "type": "generated-index",
-    "description": "Getting started with Azure App Service. These guides are under construction — check back soon!"
+    "description": "Get started with Azure App Service. Deploy your first web app and a custom container from the portal, CLI, or your editor."
   }
 }
