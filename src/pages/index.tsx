@@ -6,9 +6,9 @@ import LandingpageFeatures from '../components/LandingpageFeatures';
 import UnderConstruction from '../components/UnderConstruction';
 
 const imageUrls = [
-  './img/learner2.png',
-  './img/learner3.png', 
-  './img/learner4.png'
+  './img/hero-deploy.png',
+  './img/hero-build.png',
+  './img/hero-learn.png'
 ];
 
 export default function Home(): ReactNode {
