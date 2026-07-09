@@ -4,13 +4,13 @@
  * work well for content-centric websites.
  */
 
-/* Self-hosted heading font (Space Grotesk, variable, latin subset). */
+/* Self-hosted heading font (Bricolage Grotesque, variable, latin subset). */
 @font-face {
-  font-family: 'Space Grotesk';
+  font-family: 'Bricolage Grotesque';
   font-style: normal;
-  font-weight: 300 700;
+  font-weight: 200 800;
   font-display: swap;
-  src: url('../fonts/space-grotesk.woff2') format('woff2');
+  src: url('../fonts/bricolage-grotesque.woff2') format('woff2');
 }
 
 /* You can override the default Infima variables here. */
@@ -35,7 +35,7 @@
   --as-coral-soft: rgba(255, 106, 94, 0.12);
 
   /* Distinctive heading typeface for a bespoke feel. */
-  --ifm-heading-font-family: 'Space Grotesk', var(--ifm-font-family-base);
+  --ifm-heading-font-family: 'Bricolage Grotesque', var(--ifm-font-family-base);
   --ifm-heading-font-weight: 600;
 }
 
