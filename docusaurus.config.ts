@@ -129,15 +129,16 @@ const config: Config = {
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
-          position: 'left',
+          to: '/docs/intro',
           label: 'Workshops',
+          position: 'left',
+          activeBaseRegex: '/docs/(?!learning-paths)',
         },
         {
           to: '/docs/learning-paths/overview',
           label: 'Learning paths',
           position: 'left',
+          activeBaseRegex: '/docs/learning-paths',
         },
         {
           href: 'https://azure.github.io/AppService/',
