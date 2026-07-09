@@ -1,5 +1,6 @@
 ---
 title: Migrate an ASP.NET app to Managed Instance on App Service
+description: "Run legacy Windows apps that need OS-level changes on Azure App Service, without staying on virtual machines."
 sidebar_position: 2
 ---
 

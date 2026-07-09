@@ -1,5 +1,6 @@
 ---
 title: Scale your app up and out with autoscale
+description: "Scale a web app from a single instance to autoscaling on Azure App Service, scaling up tiers and out by CPU."
 sidebar_position: 2
 ---
 

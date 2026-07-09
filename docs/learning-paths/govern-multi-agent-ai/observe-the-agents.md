@@ -1,5 +1,6 @@
 ---
 title: "Step 2: Observe the agents"
+description: "Step 2: Observe the agents with tracing and monitoring."
 sidebar_position: 3
 ---
 

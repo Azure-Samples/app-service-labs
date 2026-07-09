@@ -1,5 +1,6 @@
 ---
 title: "Step 8: Add monitoring and alerts"
+description: "Step 8: Add monitoring and alerts with Application Insights and Azure Monitor."
 sidebar_position: 9
 ---
 

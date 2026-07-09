@@ -1,5 +1,6 @@
 ---
 title: "Step 7: Release safely with deployment slots"
+description: "Step 7: Release new versions safely with deployment slots and swaps."
 sidebar_position: 8
 ---
 

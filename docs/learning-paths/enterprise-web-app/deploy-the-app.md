@@ -1,5 +1,6 @@
 ---
 title: "Step 1: Deploy the app"
+description: "Step 1: Deploy the starter web app to Azure App Service to build on through the enterprise web app path."
 sidebar_position: 2
 ---
 

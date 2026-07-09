@@ -1,5 +1,6 @@
 ---
 title: Overview
+description: "Secure App Service apps and connect to Azure services with managed identity, Key Vault, and Entra ID."
 sidebar_position: 1
 ---
 

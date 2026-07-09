@@ -1,5 +1,6 @@
 ---
 title: Use deployment slots for zero-downtime releases
+description: "Release a new version of your app with zero downtime using an Azure App Service deployment slot and a swap."
 sidebar_position: 3
 ---
 

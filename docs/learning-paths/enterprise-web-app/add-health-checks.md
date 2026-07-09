@@ -1,5 +1,6 @@
 ---
 title: "Step 5: Add health checks and Always On"
+description: "Step 5: Add health checks and Always On to keep your app responsive."
 sidebar_position: 6
 ---
 

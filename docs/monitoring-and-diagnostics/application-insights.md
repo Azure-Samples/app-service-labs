@@ -1,5 +1,6 @@
 ---
 title: Monitor your app with Application Insights
+description: "Connect a web app on Azure App Service to Application Insights for live metrics, request analytics, and queryable logs."
 sidebar_position: 2
 ---
 

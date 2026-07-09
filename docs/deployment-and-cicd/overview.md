@@ -1,5 +1,6 @@
 ---
 title: Overview
+description: "Ship code to Azure App Service with confidence using GitHub Actions, deployment slots, and safe release patterns."
 sidebar_position: 1
 ---
 

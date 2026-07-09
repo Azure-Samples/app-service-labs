@@ -1,5 +1,6 @@
 ---
 title: Reference Key Vault secrets from App Service
+description: "Store secrets in Azure Key Vault and read them from App Service with Key Vault references and a managed identity, with no keys in your code."
 sidebar_position: 2
 ---
 

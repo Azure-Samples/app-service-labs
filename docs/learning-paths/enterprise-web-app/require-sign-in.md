@@ -1,5 +1,6 @@
 ---
 title: "Step 9: Lock down access with Entra ID"
+description: "Step 9: Lock down access by requiring Microsoft Entra ID sign-in."
 sidebar_position: 10
 ---
 

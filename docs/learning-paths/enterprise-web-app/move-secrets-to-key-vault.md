@@ -1,5 +1,6 @@
 ---
 title: "Step 4: Move secrets to Key Vault"
+description: "Step 4: Move secrets into Azure Key Vault and read them with Key Vault references."
 sidebar_position: 5
 ---
 
