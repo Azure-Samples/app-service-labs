@@ -1,22 +1,24 @@
 ---
 title: Overview
-description: "Run Azure App Service reliably in production with availability zones, backups, and disaster recovery."
+description: "Prepare Azure App Service apps for production with a curated reliability, security, observability, release, and recovery checklist."
 sidebar_position: 1
 ---
 
-import UnderConstruction from '@site/src/components/UnderConstruction';
-
 # Reliability & Operations
 
-<UnderConstruction title="This section is under construction">
-  We're building hands-on labs for this area. In the meantime, explore the official [App Service documentation](https://learn.microsoft.com/azure/app-service/).
-</UnderConstruction>
+Use this section to turn individual App Service capabilities into an operating
+model for production. Start with the checklist, then follow the linked
+standalone labs and enterprise scenario steps for hands-on practice.
 
-When ready, this section will cover:
+## Guides in this section
 
-- Availability zones
-- Backup & restore
-- Multi-region / disaster recovery
-- Deployment best practices
+- **[App Service production-readiness guide](./production-readiness-guide.md)** -
+  Review deployment, configuration, TLS, identity, Defender, observability,
+  health, scale, networking, release, backup, and recovery before production.
+  The guide links to labs across this repository and to official documentation
+  where a standalone lab is not yet available.
 
-For reference, see the [Reliability in App Service](https://learn.microsoft.com/azure/reliability/reliability-app-service) documentation.
+More hands-on reliability labs are planned for availability-zone redundancy,
+backup and restore, and multi-region recovery.
+
+For reference, see the [reliability guidance for App Service](https://learn.microsoft.com/azure/reliability/reliability-app-service).

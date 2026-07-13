@@ -12,7 +12,7 @@ import Cleanup from '@site/src/components/SharedMarkdown/_cleanup.mdx';
 
 # Monitor your app with Application Insights
 
-When something is slow or broken in production, you need to see what your app is actually doing: which requests fail, how long they take, and where the time goes. This lab connects a web app on [Azure App Service](https://learn.microsoft.com/azure/app-service/overview) to [Application Insights](https://learn.microsoft.com/azure/azure-monitor/app/app-insights-overview), the application performance monitoring (APM) service in Azure Monitor, so you get live metrics, request and failure analytics, and queryable logs with no changes to your app code.
+When something is slow or broken in production, you need to see what your app is actually doing: which requests fail, how long they take, and where the time goes. This lab connects a web app on [Azure App Service](https://learn.microsoft.com/azure/app-service/overview) to [Application Insights](https://learn.microsoft.com/azure/azure-monitor/app/app-insights-overview), the application performance monitoring (APM) service in Azure Monitor. You use either App Service autoinstrumentation or the Azure Monitor OpenTelemetry Distro to collect live metrics, request and failure analytics, and queryable logs. You also add a deterministic slow endpoint to practice diagnosis safely.
 
 You will connect Application Insights three ways so you can pick the workflow that fits you:
 
@@ -20,21 +20,29 @@ You will connect Application Insights three ways so you can pick the workflow th
 - **Azure CLI (az)** - create the resources explicitly and wire them together with app settings.
 - **Azure portal** - turn on Application Insights from a blade on your app.
 
-App Service supports **auto-instrumentation** (also called codeless attach) for **.NET**, **Node.js**, and **Java**. It injects a monitoring agent at runtime, so you collect telemetry without adding an SDK. **Python** and **PHP** use SDK-based instrumentation instead. This lab calls out the differences.
+App Service supports **autoinstrumentation** (also called codeless attach) for
+**.NET**, **Node.js**, **Java**, and supported **Python** apps. It injects a
+monitoring agent at runtime, so you collect telemetry without adding an SDK.
+This lab's executable sample paths use .NET or Node.js on Linux and include a
+current runtime support matrix for existing apps.
 
 :::info App Service Labs complements Microsoft Learn
 This lab is a hands-on, end-to-end walkthrough. For reference depth on any concept, follow the "Learn more" links to the official Microsoft Learn documentation.
 :::
 
-**Estimated time:** 45 to 60 minutes
+**Estimated time:** 60 to 75 minutes
 
 ## Objectives
 
 By the end of this lab you will be able to:
 
 - Create a workspace-based Application Insights resource and connect it to an App Service app.
-- Enable auto-instrumentation (codeless) for .NET, Node.js, and Java, and explain where support differs by runtime and OS.
-- Generate traffic and read it in Live Metrics, the failures and performance views, and Logs (KQL).
+- Connect .NET or Node.js on Linux with one instrumentation method and explain
+  where autoinstrumentation support differs by runtime and OS.
+- Generate normal, failing, and deliberately slow traffic, then diagnose it in
+  Live Metrics, Performance, Failures, and Logs (KQL).
+- Create a Standard availability test that checks the app from multiple Azure
+  locations.
 - Create a metric alert that fires on a symptom your users would notice.
 
 <Prerequisites
@@ -49,12 +57,12 @@ This lab uses the **East US** region and the **B1 (Basic)** Linux App Service ti
 
 ## How Application Insights connects to your app
 
-Application Insights stores its telemetry in a Log Analytics workspace (a **workspace-based** resource, the current model). Your app sends telemetry to Application Insights using a **connection string**, which you supply through the `APPLICATIONINSIGHTS_CONNECTION_STRING` app setting. For .NET, Node.js, and Java, a second app setting turns on the App Service-managed agent that collects requests, dependencies, exceptions, and traces automatically.
+Application Insights stores its telemetry in a Log Analytics workspace (a **workspace-based** resource, the current model). Your app sends telemetry to Application Insights using a **connection string**, which you supply through the `APPLICATIONINSIGHTS_CONNECTION_STRING` app setting. Depending on the runtime, App Service can attach a managed agent, or your code can initialize the Azure Monitor OpenTelemetry Distro. Choose one method for a given app.
 
 ```mermaid
 flowchart LR
   U[Browser or client] -->|HTTPS| APP[Web app on App Service]
-  APP -->|auto-instrumentation agent| TEL[Telemetry:<br/>requests, dependencies,<br/>exceptions, traces]
+  APP -->|agent or OpenTelemetry Distro| TEL[Telemetry:<br/>requests, dependencies,<br/>exceptions, traces]
   TEL -->|connection string| AI[Application Insights]
   AI -->|workspace-based| LAW[Log Analytics workspace]
   AI -->|metric alert rule| AL[Alert -> action group]
@@ -77,18 +85,15 @@ Always connect with the **connection string**. Instrumentation keys alone are de
     { id: 'language', label: 'Language', options: [
       { value: 'dotnet', label: '.NET' },
       { value: 'node', label: 'Node.js' },
-      { value: 'python', label: 'Python' },
-      { value: 'java', label: 'Java' },
-      { value: 'php', label: 'PHP' },
-    ]},
-    { id: 'os', label: 'OS', options: [
-      { value: 'linux', label: 'Linux' },
-      { value: 'windows', label: 'Windows' },
     ]},
   ]}
 />
 
-This lab assumes you already have a web app on App Service, or it helps you create one. Pick a tooling path, then choose your language.
+The executable paths in this lab use a B1 Linux plan with .NET or Node.js.
+Pick a tooling path, then choose one of those languages. If you are connecting
+an existing app that uses another supported runtime or Windows, use the
+[runtime support matrix](#connect-application-insights-by-runtime) after
+provisioning the monitoring resource.
 
 ## Provision and connect Application Insights
 
@@ -121,11 +126,13 @@ name: monitor-app-insights
 services:
   web:
     project: ./src
-    language: dotnet # dotnet, js, python, or java
+    language: dotnet # dotnet or js
     host: appservice
 ```
 
-Create the sample app - a tiny web app with a home route and a route that fails, so you have both successful and failed requests to look at.
+Create the sample app - a tiny web app with a home route, a route that fails,
+and a route that deliberately waits two seconds so you have successful,
+failed, and slow requests to investigate.
 
 <Tabs groupId="language" queryString>
 <TabItem value="dotnet" label=".NET">
@@ -157,6 +164,13 @@ app.MapGet("/", () => Results.Content(
 // A route that fails, so you have a failed request to look at.
 app.MapGet("/error", () => Results.Problem("Simulated failure", statusCode: 500));
 
+// A deterministic slow route for a safe performance investigation.
+app.MapGet("/slow", async () =>
+{
+    await Task.Delay(TimeSpan.FromSeconds(2));
+    return Results.Json(new { status = "complete", delayedMs = 2000 });
+});
+
 app.Run();
 ```
 
@@ -168,9 +182,21 @@ Set `language: dotnet` in `azure.yaml`, and in `infra/resources.bicep` (below) u
 Create `src/server.js`:
 
 ```js
+if (process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
+  const {useAzureMonitor} = require('@azure/monitor-opentelemetry');
+  useAzureMonitor();
+}
+
 const http = require('http');
 const port = process.env.PORT || 3000;
 http.createServer((req, res) => {
+  if (req.url === '/slow') {
+    setTimeout(() => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'complete', delayedMs: 2000 }));
+    }, 2000);
+    return;
+  }
   if (req.url === '/error') {
     res.writeHead(500, { 'Content-Type': 'text/plain' });
     res.end('Simulated failure');
@@ -189,17 +215,28 @@ Create `src/package.json`:
   "version": "1.0.0",
   "main": "server.js",
   "scripts": { "start": "node server.js" },
-  "engines": { "node": ">=20" }
+  "engines": { "node": ">=22" },
+  "dependencies": {
+    "@azure/monitor-opentelemetry": "1.18.2"
+  }
 }
 ```
+
+The same app, including a lock file, is available in
+[`samples/monitor-app-insights-node`](https://github.com/Azure-Samples/app-service-labs/tree/main/samples/monitor-app-insights-node)
+if you prefer to copy it instead of creating the two files.
 
 Set `language: js` in `azure.yaml`, and keep `linuxFxVersion: 'NODE|22-lts'` with `SCM_DO_BUILD_DURING_DEPLOYMENT` set to `'true'` in the Bicep below.
 
 </TabItem>
 </Tabs>
 
-:::note Python, Java, and PHP
-This azd sample shows the two most common runtimes. For **Java**, set `language: java` and `linuxFxVersion: 'JAVA|17-java17'`, and package a JAR with Maven (see the [Deploy your first web app](../getting-started/deploy-your-first-web-app.md) lab for the Java setup). For **Python** or **PHP**, set `language` accordingly, use the matching `linuxFxVersion`, and instrument in code - see [Connect Application Insights by runtime](#connect-application-insights-by-runtime).
+:::note Other runtimes and Windows
+The copy-paste azd sample is intentionally limited to .NET and Node.js on
+Linux. Do not select another runtime without also changing the application
+code, build workflow, plan OS, `linuxFxVersion`, and instrumentation settings.
+For an existing app, use the
+[runtime support matrix](#connect-application-insights-by-runtime).
 :::
 
 Create `infra/main.parameters.json`:
@@ -317,14 +354,6 @@ resource web 'Microsoft.Web/sites@2023-12-01' = {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: appInsights.properties.ConnectionString
         }
-        {
-          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          value: '~3' // turns on codeless attach on Linux
-        }
-        {
-          name: 'XDT_MicrosoftApplicationInsights_Mode'
-          value: 'recommended'
-        }
       ]
     }
   }
@@ -335,7 +364,14 @@ output appInsightsName string = appInsights.name
 ```
 
 :::note Per-language changes
-This template uses `linuxFxVersion: 'NODE|22-lts'` with `SCM_DO_BUILD_DURING_DEPLOYMENT` set to `'true'`. For another runtime, change that value (for example `DOTNETCORE|8.0` or `JAVA|17-java17`) and update `language` in `azure.yaml`. For **.NET** and **Java**, azd builds and publishes locally, so set `SCM_DO_BUILD_DURING_DEPLOYMENT` to `'false'`. The `ApplicationInsightsAgent_EXTENSION_VERSION` setting enables codeless attach for .NET, Node.js, and Java. For **Python** or **PHP**, remove that setting from the Bicep (it does nothing for those runtimes) and instrument in code - see the [Connect by runtime](#connect-application-insights-by-runtime) section.
+This template uses the Azure Monitor OpenTelemetry Distro in the Node.js sample
+and `linuxFxVersion: 'NODE|22-lts'` with
+`SCM_DO_BUILD_DURING_DEPLOYMENT` set to `'true'`. For the .NET sample, change
+the runtime to `DOTNETCORE|8.0`, set server-side build to `'false'`, and add
+the three Linux .NET autoinstrumentation settings from the
+[runtime support matrix](#connect-application-insights-by-runtime), including
+`XDT_MicrosoftApplicationInsights_PreemptSdk=1`. Do not combine those agent
+settings with an application that initializes the OpenTelemetry Distro.
 :::
 
 ### 3. Create an environment and deploy
@@ -413,7 +449,7 @@ az monitor app-insights component create \
 
 ### 4. Create the App Service plan and web app
 
-Use a B1 Linux plan. Choose your language runtime:
+Use a B1 Linux plan. Choose one of the executable sample runtimes:
 
 <Tabs groupId="language" queryString>
 
@@ -435,59 +471,64 @@ az webapp create --resource-group $RG_NAME --plan $PLAN_NAME --name $APP_NAME --
 
 </TabItem>
 
-<TabItem value="python" label="Python">
-
-```bash
-az appservice plan create --name $PLAN_NAME --resource-group $RG_NAME --sku B1 --is-linux
-az webapp create --resource-group $RG_NAME --plan $PLAN_NAME --name $APP_NAME --runtime "PYTHON:3.13"
-```
-
-</TabItem>
-
-<TabItem value="java" label="Java">
-
-```bash
-az appservice plan create --name $PLAN_NAME --resource-group $RG_NAME --sku B1 --is-linux
-az webapp create --resource-group $RG_NAME --plan $PLAN_NAME --name $APP_NAME --runtime "JAVA:17-java17"
-```
-
-</TabItem>
-
-<TabItem value="php" label="PHP">
-
-```bash
-az appservice plan create --name $PLAN_NAME --resource-group $RG_NAME --sku B1 --is-linux
-az webapp create --resource-group $RG_NAME --plan $PLAN_NAME --name $APP_NAME --runtime "PHP:8.4"
-```
-
-</TabItem>
-
 </Tabs>
 
 Deploy your app code to this web app using whatever workflow you prefer. If you need one, the [Deploy your first web app](../getting-started/deploy-your-first-web-app.md) lab covers deployment for every language. For the fastest verification, deploy a small app that has a home route and a route that returns HTTP 500 so you generate both successful and failed requests.
 
 ### 5. Connect Application Insights
 
-Read the connection string, then set the app settings that connect and instrument the app:
+Read the connection string:
 
 ```bash
 AI_CONN=$(az monitor app-insights component show \
   --app $AI_NAME \
   --resource-group $RG_NAME \
   --query connectionString -o tsv)
+```
 
+Choose the same language as the web app. These commands assume the app does
+not already initialize an Application Insights SDK or the Azure Monitor
+OpenTelemetry Distro.
+
+<Tabs groupId="language" queryString>
+<TabItem value="dotnet" label=".NET">
+
+```bash
 az webapp config appsettings set \
   --resource-group $RG_NAME \
   --name $APP_NAME \
   --settings \
     APPLICATIONINSIGHTS_CONNECTION_STRING="$AI_CONN" \
     ApplicationInsightsAgent_EXTENSION_VERSION="~3" \
-    XDT_MicrosoftApplicationInsights_Mode="recommended"
+    XDT_MicrosoftApplicationInsights_Mode="recommended" \
+    XDT_MicrosoftApplicationInsights_PreemptSdk="1"
 
 az webapp restart --resource-group $RG_NAME --name $APP_NAME
 ```
 
-The `ApplicationInsightsAgent_EXTENSION_VERSION` setting enables codeless attach for .NET, Node.js, and Java. See [Connect by runtime](#connect-application-insights-by-runtime) for what changes on Windows and for Python and PHP.
+</TabItem>
+<TabItem value="node" label="Node.js">
+
+```bash
+az webapp config appsettings set \
+  --resource-group $RG_NAME \
+  --name $APP_NAME \
+  --settings \
+    APPLICATIONINSIGHTS_CONNECTION_STRING="$AI_CONN" \
+    ApplicationInsightsAgent_EXTENSION_VERSION="~3"
+
+az webapp restart --resource-group $RG_NAME --name $APP_NAME
+```
+
+Linux Node.js autoinstrumentation is in public preview. If your Node.js app
+initializes the Azure Monitor OpenTelemetry Distro, set only
+`APPLICATIONINSIGHTS_CONNECTION_STRING` and do not run the agent command above.
+
+</TabItem>
+</Tabs>
+
+See [Connect by runtime](#connect-application-insights-by-runtime) for the
+settings required by an existing Windows app or another supported runtime.
 
 </TabItem>
 
@@ -505,13 +546,31 @@ In the app's left menu, under **Monitoring**, select **Application Insights**, t
 
 - **Application Insights**: select **Create new resource** (the default name matches your app), or choose an existing resource.
 - **Log Analytics workspace**: select an existing workspace or let the portal create one. This keeps the resource workspace-based.
-- For a supported runtime (**.NET**, **Node.js**, **Java**), the blade shows a **Collection level** or instrumentation option. Leave it at the **Recommended** setting.
+- For a supported runtime, the blade shows a **Collection level** or
+  instrumentation option. Leave it at the **Recommended** setting.
 
 Select **Apply**, then confirm. The portal sets `APPLICATIONINSIGHTS_CONNECTION_STRING` and the agent app settings for you and restarts the app.
 
-:::note Python and PHP in the portal
-The **Turn on Application Insights** blade instruments .NET, Node.js, and Java. For Python and PHP, create the Application Insights resource here, copy its connection string, and instrument in code (see [Connect by runtime](#connect-application-insights-by-runtime)).
+:::note Runtime support
+The portal supports App Service autoinstrumentation for .NET, Java, Node.js,
+and Python 3.9 through 3.13 on Linux when deployed as code. Python custom
+containers and Windows Python apps are not supported. PHP has no App
+Service-managed autoinstrumentation path, so it is outside this lab.
 :::
+
+Set the variables used by the common command-line verification and cleanup
+steps:
+
+```bash
+export RG_NAME="<resource-group-name>"
+export APP_NAME="<web-app-name>"
+export AI_NAME="<application-insights-name>"
+export LAW_ID=$(az monitor app-insights component show \
+  --app "$AI_NAME" \
+  --resource-group "$RG_NAME" \
+  --query workspaceResourceId -o tsv)
+export LAW_NAME=${LAW_ID##*/}
+```
 
 </TabItem>
 
@@ -519,13 +578,20 @@ The **Turn on Application Insights** blade instruments .NET, Node.js, and Java. 
 
 ## Connect Application Insights by runtime
 
-Auto-instrumentation support differs by language and OS. This section summarizes what to set for each runtime; the app settings go on the web app (the CLI, azd, and portal paths above all set them the same way).
+Autoinstrumentation support differs by language and OS. This reference is for
+connecting an existing code-based App Service app. The executable provisioning
+paths above remain limited to .NET and Node.js on Linux.
 
-<Tabs groupId="language" queryString>
+<Tabs groupId="runtime" queryString>
 
 <TabItem value="dotnet" label=".NET">
 
-.NET and .NET Core have the broadest codeless support: **Windows** (.NET Framework and .NET Core) and **Linux** (.NET Core and later). Set the connection string and the agent version.
+This lab's .NET path targets ASP.NET Core on modern .NET, which supports
+autoinstrumentation on **Windows** and **Linux**. The required
+`XDT_MicrosoftApplicationInsights_PreemptSdk` setting below is specific to
+ASP.NET Core autoinstrumentation. For classic ASP.NET on .NET Framework, follow
+the separate settings in the
+[App Service autoinstrumentation reference](https://learn.microsoft.com/azure/azure-monitor/app/codeless-app-service?tabs=net).
 
 <Tabs groupId="os" queryString>
 
@@ -536,6 +602,7 @@ Auto-instrumentation support differs by language and OS. This section summarizes
 | `APPLICATIONINSIGHTS_CONNECTION_STRING` | your connection string |
 | `ApplicationInsightsAgent_EXTENSION_VERSION` | `~3` |
 | `XDT_MicrosoftApplicationInsights_Mode` | `recommended` |
+| `XDT_MicrosoftApplicationInsights_PreemptSdk` | `1` |
 
 </TabItem>
 
@@ -546,6 +613,7 @@ Auto-instrumentation support differs by language and OS. This section summarizes
 | `APPLICATIONINSIGHTS_CONNECTION_STRING` | your connection string |
 | `ApplicationInsightsAgent_EXTENSION_VERSION` | `~2` |
 | `XDT_MicrosoftApplicationInsights_Mode` | `recommended` |
+| `XDT_MicrosoftApplicationInsights_PreemptSdk` | `1` |
 
 </TabItem>
 
@@ -556,6 +624,13 @@ Auto-instrumentation support differs by language and OS. This section summarizes
 <TabItem value="node" label="Node.js">
 
 Node.js auto-instrumentation is supported on **Linux** (public preview) and **Windows** for code-based apps. The agent collects requests, dependencies, exceptions, traces, and heartbeats.
+
+For a code-controlled option, initialize the
+[Azure Monitor OpenTelemetry Distro](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=nodejs)
+before loading `http`, Express, or other instrumented libraries. The azd sample
+in this lab uses that approach and needs only
+`APPLICATIONINSIGHTS_CONNECTION_STRING`; do not also enable the codeless agent
+for the same app.
 
 <Tabs groupId="os" queryString>
 
@@ -584,70 +659,118 @@ Node.js auto-instrumentation is supported on **Linux** (public preview) and **Wi
 
 <TabItem value="python" label="Python">
 
-Python on App Service uses **SDK-based** instrumentation with the [Azure Monitor OpenTelemetry Distro](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=python), not the codeless agent. Add the package and one line at startup.
-
-Add to `requirements.txt`:
-
-```text
-azure-monitor-opentelemetry
-```
-
-At the top of your app's entry point, before you create the app:
-
-```python
-from azure.monitor.opentelemetry import configure_azure_monitor
-
-configure_azure_monitor()  # reads APPLICATIONINSIGHTS_CONNECTION_STRING
-```
-
-Set only the connection string on the web app (do not set `ApplicationInsightsAgent_EXTENSION_VERSION`):
-
-| App setting | Value |
-| --- | --- |
-| `APPLICATIONINSIGHTS_CONNECTION_STRING` | your connection string |
-
-The distro auto-instruments popular libraries (for example Flask, Django, and requests) and sends telemetry to Application Insights.
-
-</TabItem>
-
-<TabItem value="java" label="Java">
-
-Java auto-instrumentation is supported on **Linux** and **Windows**. The App Service-managed agent attaches the Application Insights Java agent for you.
+Python autoinstrumentation is supported for Python 3.9 through 3.13 on **Linux
+App Service deployed as code**. Windows apps and custom containers are not
+supported, and Live Metrics is not available for this path.
 
 | App setting | Value |
 | --- | --- |
 | `APPLICATIONINSIGHTS_CONNECTION_STRING` | your connection string |
 | `ApplicationInsightsAgent_EXTENSION_VERSION` | `~3` |
 
-For advanced settings (sampling, custom dimensions), supply a JSON config as described in the [Java standalone configuration](https://learn.microsoft.com/azure/azure-monitor/app/java-standalone-config) reference.
+The managed agent instruments supported libraries such as Django, FastAPI,
+Flask, `requests`, and `urllib3`. Add supported OpenTelemetry community
+instrumentation packages only when you need coverage for another library.
 
 </TabItem>
 
-<TabItem value="php" label="PHP">
+<TabItem value="java" label="Java">
 
-PHP has no codeless agent on App Service. Instrument it with the [OpenTelemetry PHP](https://opentelemetry.io/docs/languages/php/) SDK and the Azure Monitor OpenTelemetry exporter, or send custom telemetry to the ingestion endpoint. Set the connection string on the app and configure the OpenTelemetry SDK to export to Application Insights:
+Java autoinstrumentation is supported on **Linux** and **Windows**. The App
+Service-managed agent attaches the Application Insights Java agent for you.
+
+<Tabs groupId="os" queryString>
+<TabItem value="linux" label="Linux">
 
 | App setting | Value |
 | --- | --- |
 | `APPLICATIONINSIGHTS_CONNECTION_STRING` | your connection string |
+| `ApplicationInsightsAgent_EXTENSION_VERSION` | `~3` |
+
+</TabItem>
+<TabItem value="windows" label="Windows">
+
+| App setting | Value |
+| --- | --- |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | your connection string |
+| `ApplicationInsightsAgent_EXTENSION_VERSION` | `~2` |
+| `XDT_MicrosoftApplicationInsights_Java` | `1` |
+
+</TabItem>
+</Tabs>
+
+For advanced settings such as sampling and custom dimensions, supply a JSON
+config as described in the
+[Java standalone configuration](https://learn.microsoft.com/azure/azure-monitor/app/java-standalone-config)
+reference.
 
 </TabItem>
 
 </Tabs>
 
-:::tip SDK-based instrumentation is the deeper option
-Auto-instrumentation is the fastest way to get telemetry, but adding the Application Insights or Azure Monitor OpenTelemetry SDK to your code gives you more: custom events and metrics, precise dependency tracking, and control over sampling. You can use both together - the SDK enriches what the agent already collects. See [Data collection basics](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-overview).
+:::warning Choose one instrumentation method
+Do not combine App Service autoinstrumentation with an Application Insights SDK
+or the Azure Monitor OpenTelemetry Distro in the same server application.
+Overlapping instrumentation can duplicate telemetry and increase ingestion
+cost. Use the OpenTelemetry Distro instead of the managed agent when you need
+code-level control, then add custom spans or metrics through OpenTelemetry. See
+[Data collection basics](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-overview).
 :::
+
+## Add a safe slow endpoint
+
+The azd .NET and Node.js samples already include `/slow`. It waits for two
+seconds and returns HTTP 200. The delay is deterministic, makes no external
+network call, and consumes little CPU, so it is safer and more reproducible
+than depending on an unreliable public service.
+
+If you brought your own app through the Azure CLI or portal path, add the same
+behavior in your runtime and redeploy it. Keep this diagnostic route only in a
+nonproduction environment, or protect it with authentication.
+
+<Tabs groupId="language" queryString>
+<TabItem value="dotnet" label=".NET">
+
+Add this before `app.Run()`:
+
+```csharp
+app.MapGet("/slow", async () =>
+{
+    await Task.Delay(TimeSpan.FromSeconds(2));
+    return Results.Json(new { status = "complete", delayedMs = 2000 });
+});
+```
+
+</TabItem>
+<TabItem value="node" label="Node.js">
+
+Add this route to an Express app:
+
+```javascript
+app.get('/slow', async (_req, res) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  res.json({status: 'complete', delayedMs: 2000});
+});
+```
+
+</TabItem>
+</Tabs>
 
 ## Generate some traffic
 
-Telemetry only appears once your app handles requests. Send a burst that includes both successful and failing requests. Replace the hostname with your app's:
+Telemetry only appears once your app handles requests. Send a burst that
+includes successful, failing, and slow requests. Replace the hostname with
+your app's:
 
 ```bash
 APP_URL=https://<your-app-name>.azurewebsites.net
-for i in $(seq 1 60); do
+for i in $(seq 1 30); do
   curl -s -o /dev/null "$APP_URL/"
   curl -s -o /dev/null "$APP_URL/error"
+done
+
+for i in $(seq 1 6); do
+  curl --fail --silent --max-time 5 "$APP_URL/slow" --output /dev/null
 done
 ```
 
@@ -659,12 +782,28 @@ Open your Application Insights resource in the [Azure portal](https://portal.azu
 
 ### Live Metrics
 
-Select **Live metrics** (under **Investigate**). While you send traffic, you see request rate, request duration, and failures update in near real time, with a rolling feed of sample requests. Live Metrics is the fastest way to confirm the connection works and to watch a deployment.
+Select **Live metrics** (under **Investigate**). Leave the pane open, then run
+the traffic commands again. Watch request rate, duration, and failures update
+with about one-second latency. The live feed is sampled and is not retained;
+use Logs for a durable investigation.
+
+Filter requests to URL containing `/slow` if your runtime supports Live Metrics
+filters. Confirm request duration rises while the slow loop runs, then clear
+the filter. Live Metrics is the fastest way to validate telemetry during a
+deployment, but it is not the place to calculate a long-term service-level
+indicator.
 
 ### Failures and Performance
 
-- **Failures** (under **Investigate**) breaks down failed requests by response code and operation. Your `/error` requests appear here as HTTP 500 responses; select one to drill into a sample and its exception.
-- **Performance** shows request duration by operation, so you can find the slowest endpoints and see the distribution of response times.
+- **Failures** (under **Investigate**) breaks down failed requests by response
+  code and operation. Your `/error` requests appear as HTTP 500 responses.
+  Select one to inspect request details. This route returns a failure response
+  but does not throw, so exception telemetry is not expected.
+- **Performance** shows request duration by operation. Select the `/slow`
+  operation, select **Drill into samples**, and open a sample. Its end-to-end
+  transaction should show about two seconds in the request itself and no slow
+  external dependency. That distinction prevents you from blaming a database
+  or remote service when the delay is inside application code.
 
 ### Logs (KQL)
 
@@ -681,8 +820,52 @@ You should see rows for `200` and `500`. To find the slowest requests:
 ```kusto
 requests
 | top 10 by duration desc
-| project timestamp, name, resultCode, duration
+| project timestamp, name, url, resultCode, duration, operation_Id
 ```
+
+Summarize request latency by operation and include the median, 95th percentile,
+and 99th percentile:
+
+```kusto
+requests
+| where timestamp > ago(30m)
+| summarize
+    requests=count(),
+    failures=countif(success == false),
+    p50=percentile(duration, 50),
+    p95=percentile(duration, 95),
+    p99=percentile(duration, 99)
+  by name
+| order by p95 desc
+```
+
+The `/slow` operation should have a p50 and p95 near two seconds. Find only
+slow successful requests:
+
+```kusto
+requests
+| where timestamp > ago(30m)
+| where success == true and duration > 1s
+| project timestamp, name, url, duration, operation_Id
+| order by duration desc
+```
+
+If your app calls a database or HTTP service, correlate requests with
+dependencies before assigning a cause:
+
+```kusto
+requests
+| where timestamp > ago(30m) and duration > 1s
+| join kind=leftouter (
+    dependencies
+    | project operation_Id, dependencyName=name, target, dependencyDuration=duration, dependencySuccess=success
+  ) on operation_Id
+| project timestamp, name, duration, dependencyName, target, dependencyDuration, dependencySuccess
+| order by duration desc
+```
+
+For this lab's deterministic `/slow` route, dependency columns should be empty
+or unrelated. The request remains slow because the delay is in the endpoint.
 
 :::note Workspace table names
 Because this resource is workspace-based, the same data is available in the Log Analytics workspace under the `AppRequests` table (Application Insights presents it as `requests` in its own Logs blade). Both work; use whichever surface you are in.
@@ -699,6 +882,140 @@ WS_ID=$(az monitor log-analytics workspace show \
 az monitor log-analytics query \
   --workspace "$WS_ID" \
   --analytics-query "AppRequests | summarize count() by ResultCode"
+```
+
+## Create a Standard availability test
+
+An availability test sends a safe HTTP request from Azure-managed locations on
+a schedule. Use a **Standard test**, not the deprecated URL ping test. Standard
+tests are billed through Azure Monitor, so review the current
+[availability-test pricing](https://azure.microsoft.com/pricing/details/monitor/)
+and delete the lab resource group when you finish.
+
+The test checks the public home page every five minutes from five locations,
+expects HTTP 200, validates the TLS certificate, and warns when fewer than
+seven certificate-validity days remain. Five is the Microsoft-recommended
+minimum for distinguishing an app problem from a regional network problem;
+each additional location increases the number of billable test executions.
+
+<Tabs groupId="tooling" queryString>
+
+<TabItem value="azd" label="Azure Developer CLI (azd)">
+
+Append this resource to `infra/resources.bicep`, then run `azd provision`:
+
+```bicep
+var availabilityTestName = 'availability-${appInsightsName}'
+
+resource availabilityTest 'Microsoft.Insights/webtests@2022-06-15' = {
+  name: availabilityTestName
+  location: location
+  tags: {
+    'hidden-link:${appInsights.id}': 'Resource'
+  }
+  properties: {
+    SyntheticMonitorId: availabilityTestName
+    Name: availabilityTestName
+    Enabled: true
+    Frequency: 300
+    Timeout: 30
+    Kind: 'standard'
+    RetryEnabled: true
+    Locations: [
+      { Id: 'us-ca-sjc-azr' }
+      { Id: 'us-va-ash-azr' }
+      { Id: 'emea-au-syd-edge' }
+      { Id: 'us-tx-sn1-azr' }
+      { Id: 'emea-nl-ams-azr' }
+    ]
+    Request: {
+      RequestUrl: 'https://${web.properties.defaultHostName}/'
+      HttpVerb: 'GET'
+      FollowRedirects: true
+    }
+    ValidationRules: {
+      ExpectedHttpStatusCode: 200
+      SSLCheck: true
+      SSLCertRemainingLifetimeCheck: 7
+    }
+  }
+}
+```
+
+The template already defines `appInsights`, `appInsightsName`, `location`, and
+`webUri`. Provision the new resource:
+
+```bash
+azd provision
+```
+
+</TabItem>
+
+<TabItem value="az" label="Azure CLI (az)">
+
+Create the Standard test and link it to the Application Insights component
+with the hidden-link tag:
+
+```bash
+SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+AI_ID=$(az monitor app-insights component show \
+  --app "$AI_NAME" \
+  --resource-group "$RG_NAME" \
+  --query id -o tsv)
+AVAILABILITY_TEST_NAME="availability-${AI_NAME}"
+
+az monitor app-insights web-test create \
+  --resource-group "$RG_NAME" \
+  --location "$LOCATION" \
+  --web-test-kind standard \
+  --name "$AVAILABILITY_TEST_NAME" \
+  --defined-web-test-name "$AVAILABILITY_TEST_NAME" \
+  --synthetic-monitor-id "$AVAILABILITY_TEST_NAME" \
+  --request-url "$APP_URL/" \
+  --http-verb GET \
+  --follow-redirects true \
+  --expected-status-code 200 \
+  --ssl-check true \
+  --ssl-lifetime-check 7 \
+  --frequency 300 \
+  --timeout 30 \
+  --retry-enabled true \
+  --enabled true \
+  --locations Id="us-ca-sjc-azr" \
+  --locations Id="us-va-ash-azr" \
+  --locations Id="emea-au-syd-edge" \
+  --locations Id="us-tx-sn1-azr" \
+  --locations Id="emea-nl-ams-azr" \
+  --tags "hidden-link:${AI_ID}=Resource"
+```
+
+</TabItem>
+
+<TabItem value="portal" label="Azure portal">
+
+1. In the Application Insights resource, select **Availability**.
+2. Select **Add Standard test**. Do not select a URL ping test.
+3. Name it `availability-home`, enter the app's HTTPS home-page URL, and use
+   **GET**.
+4. Set the frequency to **5 minutes** and timeout to **30 seconds**.
+5. Choose at least five test locations.
+6. Enable retries, TLS certificate validation, and the certificate lifetime
+   check with a seven-day threshold.
+7. Set the expected HTTP status to **200**, then select **Create**.
+
+</TabItem>
+
+</Tabs>
+
+Wait for at least one five-minute interval. In **Availability**, select the test
+to see success percentage, duration, and results by test location. You can also
+query the results:
+
+```kusto
+availabilityResults
+| where timestamp > ago(30m)
+| summarize tests=count(), failures=countif(success == false), p95=percentile(duration, 95) by name, location
+| order by name asc, location asc
 ```
 
 ## Create a metric alert
@@ -821,37 +1138,100 @@ Confirm the app is serving traffic and that telemetry is flowing.
    Content-Type: text/html
    ```
 
-2. Telemetry is arriving. In the Application Insights **Logs** blade, run:
+2. The diagnostic endpoint is deliberately slow but successful:
 
-   ```kusto
-   requests | summarize count() by resultCode
+   ```bash
+   curl --fail --silent \
+     --output /dev/null \
+     --write-out "HTTP %{http_code} in %{time_total}s\n" \
+     "$APP_URL/slow"
    ```
 
-   You should see a nonzero count for `200` and, if you called `/error`, for `500`. During authoring, this returned 195 requests at `200` and 190 at `500` for the Azure CLI run.
+   Expect HTTP `200` in about two seconds. A much longer response suggests an
+   unrelated startup or platform issue.
 
-3. The alert rule is enabled. The `az monitor metrics alert list` output above shows `enabled: True`.
+3. Telemetry is arriving. In the Application Insights **Logs** blade, run:
+
+   ```kusto
+   requests
+   | summarize requests=count(), p95=percentile(duration, 95) by name, resultCode
+   | order by p95 desc
+   ```
+
+   You should see successful and failed requests, and `/slow` should have a p95
+   near two seconds.
+
+4. The Standard availability test is enabled. In **Availability**, confirm at
+   least one successful result from each configured location. If the first run
+   has not completed, wait for the five-minute interval and refresh.
+
+5. The alert rule is enabled. The `az monitor metrics alert list` output above
+   shows `enabled: True`.
+
+<Tabs groupId="tooling" queryString>
+<TabItem value="azd" label="Azure Developer CLI (azd)">
+
+## Cleanup
+
+Delete the Azure resources and the local azd environment:
+
+```bash
+azd down --purge --force
+```
+
+</TabItem>
+<TabItem value="az" label="Azure CLI (az)">
 
 <Cleanup />
 
-:::note If you used azd
-Delete everything azd created (the resource group, resources, and the local environment) with `azd down --purge --force` instead of the command above.
-:::
+</TabItem>
+<TabItem value="portal" label="Azure portal">
+
+<Cleanup />
+
+</TabItem>
+</Tabs>
 
 ## Summary
 
 In this lab, you connected an App Service web app to Application Insights and confirmed telemetry was flowing. You learned how to:
 
 - Create a **workspace-based** Application Insights resource and connect it with the `APPLICATIONINSIGHTS_CONNECTION_STRING` app setting.
-- Enable **auto-instrumentation** for .NET, Node.js, and Java, and where support differs by OS, with Python and PHP using SDK-based instrumentation.
-- Explore telemetry in **Live Metrics**, **Failures**, **Performance**, and **Logs** with KQL.
+- Connect .NET or Node.js on Linux with one instrumentation method and identify
+  the supported App Service autoinstrumentation paths for .NET, Node.js, Java,
+  and Python.
+- Diagnose a deterministic slow endpoint in **Live Metrics**,
+  **Performance**, and **Logs**, and distinguish in-process delay from a slow
+  dependency.
+- Use KQL to summarize result codes, latency percentiles, slow requests,
+  dependencies, and availability.
+- Create a multi-location **Standard availability test** with TLS validation.
 - Create a **metric alert** on server response time or failed requests.
 
 ## Troubleshooting
 
-- **No data in Application Insights.** Confirm `APPLICATIONINSIGHTS_CONNECTION_STRING` is set on the app and that you restarted it. Codeless attach only takes effect after a restart and a request. Send more traffic and wait a minute or two - Live Metrics updates first, then the aggregated views. See [Troubleshoot no data](https://learn.microsoft.com/azure/azure-monitor/app/azure-web-apps-troubleshoot).
+- **No data in Application Insights.** Confirm
+  `APPLICATIONINSIGHTS_CONNECTION_STRING` is set on the app and that you
+  restarted it. Autoinstrumentation only takes effect after a restart and a
+  request. Send more traffic and allow time for ingestion. See
+  [Troubleshoot Application Insights autoinstrumentation](https://learn.microsoft.com/troubleshoot/azure/azure-monitor/app-insights/telemetry/auto-instrumentation-troubleshoot).
 - **Data appears in Logs but not in the classic query API.** Workspace-based resources store telemetry in the `AppRequests` table in the Log Analytics workspace. Query the workspace with `az monitor log-analytics query` (shown above) or use the Application Insights **Logs** blade, which exposes the `requests` alias.
 - **azd up reports `unable to find a resource tagged with 'azd-service-name: web'`.** This is the first-run output-cache race. Run `azd deploy` once more; the resources already exist and the code deploy completes.
-- **Wrong runtime instrumented, or nothing for Python or PHP.** Codeless attach covers .NET, Node.js, and Java only. For Python, use the Azure Monitor OpenTelemetry Distro; for PHP, use the OpenTelemetry SDK. See [Connect by runtime](#connect-application-insights-by-runtime).
+- **Wrong runtime instrumented.** Confirm the app uses a supported runtime and
+  OS combination and that its exact app settings match the
+  [runtime support matrix](#connect-application-insights-by-runtime). Python
+  autoinstrumentation supports Python 3.9 through 3.13 on Linux App Service
+  deployed as code, not Windows or custom containers.
+- **`/slow` is fast or returns 404.** Confirm you added the route to the deployed
+  app, not only to a local copy, then redeploy and restart. The expected
+  duration is about two seconds.
+- **The Standard availability test is not linked to Application Insights.**
+  Confirm the `hidden-link:<application-insights-resource-id>` tag exists on
+  the web test. In the portal, create the test from the Application Insights
+  **Availability** pane.
+- **Availability results have not appeared.** The test runs every five minutes.
+  Confirm the URL is publicly reachable, wait for a complete interval, and
+  check that the selected test locations are valid.
 - **Alert never fires.** Metric alerts evaluate on a schedule and need enough data in the window. Generate sustained traffic (or lower the threshold) and confirm the rule shows `enabled: True`.
 
 ## Learn more
@@ -861,6 +1241,9 @@ In this lab, you connected an App Service web app to Application Insights and co
 - [Workspace-based Application Insights resources](https://learn.microsoft.com/azure/azure-monitor/app/create-workspace-resource)
 - [Enable Azure Monitor OpenTelemetry (Python and more)](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable)
 - [Live Metrics](https://learn.microsoft.com/azure/azure-monitor/app/live-stream)
+- [Application Insights availability tests](https://learn.microsoft.com/azure/azure-monitor/app/availability)
+- [Dependency tracking and slow-request diagnosis](https://learn.microsoft.com/azure/azure-monitor/app/dependencies)
+- [Application Insights telemetry data model](https://learn.microsoft.com/azure/azure-monitor/app/data-model-complete)
 - [Log-based and pre-aggregated metrics](https://learn.microsoft.com/azure/azure-monitor/app/pre-aggregated-metrics-log-metrics)
 - [Create a metric alert rule](https://learn.microsoft.com/azure/azure-monitor/alerts/alerts-create-metric-alert-rule)
 - [Kusto Query Language (KQL) overview](https://learn.microsoft.com/azure/data-explorer/kusto/query/)

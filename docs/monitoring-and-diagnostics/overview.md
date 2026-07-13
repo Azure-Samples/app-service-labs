@@ -14,10 +14,11 @@ logs and metrics, and alerting on problems before your users notice.
 
 - **[Monitor your app with Application Insights](./application-insights.md)** -
   Connect a web app to a workspace-based Application Insights resource, enable
-  auto-instrumentation, and explore Live Metrics, failures, performance, and
-  Logs (KQL), then create a metric alert. Follow the same path three ways
-  (Azure Developer CLI, Azure CLI, or the Azure portal) across .NET, Node.js,
-  Python, Java, and PHP.
+  auto-instrumentation, diagnose a deliberately slow endpoint with Live
+  Metrics and KQL, create a multi-location Standard availability test, and add
+  a metric alert. Follow the executable Linux path with .NET or Node.js through
+  Azure Developer CLI, Azure CLI, or the Azure portal, with a support matrix
+  for connecting existing .NET, Node.js, Python, and Java apps.
 
 More monitoring and diagnostics labs are on the way, covering log stream and
 diagnostic logging, Diagnose and solve problems (AppLens), and advanced console

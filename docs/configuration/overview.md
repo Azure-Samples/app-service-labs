@@ -4,19 +4,18 @@ description: "Configure App Service apps: app settings, connection strings, star
 sidebar_position: 1
 ---
 
-import UnderConstruction from '@site/src/components/UnderConstruction';
-
 # Configuration
 
-<UnderConstruction title="This section is under construction">
-  We're building hands-on labs for this area. In the meantime, explore the official [App Service documentation](https://learn.microsoft.com/azure/app-service/).
-</UnderConstruction>
+Configure application behavior and production hostnames without hard-coding
+environment details in your app.
 
-When ready, this section will cover:
+## Labs in this section
 
-- App settings & connection strings
-- Environment variables & startup commands (Linux)
-- Custom domains
-- TLS/SSL certificates (managed certificates)
+- **[Secure a custom domain with a managed certificate](./secure-custom-domain-managed-certificate.mdx)** -
+  Map a real public subdomain, prove DNS ownership, create and bind a free App
+  Service managed certificate, then enforce HTTPS and TLS 1.2 or later.
 
-For reference, see the [Configure an App Service app](https://learn.microsoft.com/azure/app-service/configure-common) documentation.
+More labs are planned for app settings, connection strings, environment
+variables, and Linux startup commands.
+
+For reference, see the [App Service configuration documentation](https://learn.microsoft.com/azure/app-service/configure-common).

@@ -67,6 +67,7 @@ app. The app exposes a few endpoints:
 | `/api/products` | Catalog as JSON, with the current data source |
 | `/api/info` | Current configuration and data source - handy for verifying each step |
 | `/health` | Health probe used in a later step |
+| `/slow` | Safe two-second response used for Application Insights diagnosis |
 
 ```mermaid
 flowchart LR
@@ -220,7 +221,7 @@ You should see a response like this, confirming the app is live and serving its
 in-memory catalog:
 
 ```json
-{"catalogTitle":"Zava Widgets","dataSource":"in-memory","partnerIntegration":"not-configured","node":"v20.x.x"}
+{"catalogTitle":"Zava Widgets","dataSource":"in-memory","partnerIntegration":"not-configured","node":"v22.x.x"}
 ```
 
 Open `$APP_URL` in a browser to see the storefront.

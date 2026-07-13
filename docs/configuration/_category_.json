@@ -3,6 +3,6 @@
   "position": 5,
   "link": {
     "type": "generated-index",
-    "description": "Configure your app - settings, connection strings, startup commands, custom domains, and certificates. Labs coming soon."
+    "description": "Configure App Service settings, startup behavior, custom domains, and certificates."
   }
 }
