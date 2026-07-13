@@ -3,6 +3,6 @@
   "position": 11,
   "link": {
     "type": "generated-index",
-    "description": "Run App Service reliably in production - availability zones, backups, and disaster recovery. Labs coming soon."
+    "description": "Prepare App Service apps for production with reliability, security, observability, release, and recovery guidance."
   }
 }

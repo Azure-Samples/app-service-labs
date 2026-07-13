@@ -18,9 +18,14 @@ references, and Microsoft Entra ID.
     resolve it at runtime using the app's **managed identity** - so there are no
     secrets in your code or configuration.
 
+- **[Protect App Service with Microsoft Defender](./microsoft-defender-for-app-service.mdx)**
+  - Inspect and deliberately enable the subscription-wide Defender for App
+    Service plan, review recommendations and alerts safely, route App Service
+    diagnostics to Log Analytics, and restore the original pricing tier.
+
 More labs are on the way, including:
 
-- Authentication and authorization (Easy Auth) with Microsoft Entra ID
-- Connect to Azure services with managed identity
+- Authentication and authorization with Microsoft Entra ID
+- Connect to more Azure services with managed identity
 
 For reference, see the [App Service security](https://learn.microsoft.com/azure/app-service/overview-security) documentation.

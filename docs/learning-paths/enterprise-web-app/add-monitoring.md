@@ -30,6 +30,11 @@ In this step you will:
 - Generate a little traffic and confirm telemetry is flowing.
 - Create a metric alert that fires on server errors.
 
+For a deeper standalone exercise with Live Metrics, latency-percentile KQL,
+slow-request diagnosis, and Standard availability tests, use
+[Monitor your app with Application Insights](../../monitoring-and-diagnostics/application-insights.md)
+after this learning-path step.
+
 **Estimated time:** 30 to 40 minutes.
 
 ## Objectives
@@ -63,6 +68,14 @@ dependencies, and exceptions for you:
 
 - `APPLICATIONINSIGHTS_CONNECTION_STRING` tells the app where to send telemetry.
 - `ApplicationInsightsAgent_EXTENSION_VERSION` turns on the managed agent (codeless attach).
+
+:::note Preview feature
+Node.js autoinstrumentation on Linux App Service is in public preview. Review
+the [Supplemental Terms of Use for Microsoft Azure Previews](https://azure.microsoft.com/support/legal/preview-supplemental-terms/)
+before using this path for production. For a code-controlled alternative, use
+the Azure Monitor OpenTelemetry Distro described in the
+[standalone Application Insights lab](../../monitoring-and-diagnostics/application-insights.md#connect-application-insights-by-runtime).
+:::
 
 ```mermaid
 flowchart LR
@@ -247,5 +260,6 @@ users to sign in with Entra ID before they can reach the app at all.
 
 - [Application Insights for Azure App Service](https://learn.microsoft.com/azure/azure-monitor/app/azure-web-apps-nodejs)
 - [Create metric alert rules in Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/alerts/alerts-create-metric-alert-rule)
+- [Application Insights availability tests](https://learn.microsoft.com/azure/azure-monitor/app/availability)
 
 <PathNav pathId="enterprise-web-app" step={8} />

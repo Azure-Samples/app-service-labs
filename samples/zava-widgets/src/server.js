@@ -86,6 +86,13 @@ app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'healthy', dataSource: useSql ? 'azure-sql' : 'in-memory' });
 });
 
+// Deterministic nonproduction diagnostic route used by the Application Insights
+// lab. It makes no external call and consumes little CPU.
+app.get('/slow', async (_req, res) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  res.status(200).json({ status: 'complete', delayedMs: 2000 });
+});
+
 // Machine-readable state - handy for verifying each lab step with curl.
 app.get('/api/info', async (_req, res) => {
   res.json({

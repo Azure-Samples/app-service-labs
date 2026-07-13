@@ -41,6 +41,7 @@ with a system-assigned managed identity) and deploys the app in `src/`.
 | `/api/products` | Catalog as JSON (shows the data source) |
 | `/api/info` | Current configuration and data source - handy for verifying each lab step |
 | `/health` | Health probe used by a later reliability lab |
+| `/slow` | Safe two-second response used for Application Insights diagnosis |
 
 ## Data source
 
