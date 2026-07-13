@@ -379,15 +379,34 @@ must show success. Select **Add**.
 <Tabs groupId="tooling" queryString>
 <TabItem value="azd" label="Azure Developer CLI (azd)">
 
-The App Service managed-certificate CLI command is currently in preview. Create
-the certificate, capture its thumbprint, and bind it to the hostname:
+The App Service managed-certificate CLI command is currently in preview.
+Certificate issuance is asynchronous, so request the certificate, wait for Azure
+to return its thumbprint, and then bind it to the hostname:
 
 ```bash
-CERT_THUMBPRINT=$(az webapp config ssl create \
+az webapp config ssl create \
   --name "$APP_NAME" \
   --resource-group "$RG_NAME" \
   --hostname "$CUSTOM_HOSTNAME" \
-  --query thumbprint -o tsv)
+  --output none
+
+CERT_THUMBPRINT=""
+for attempt in {1..30}; do
+  CERT_THUMBPRINT=$(az webapp config ssl list \
+    --resource-group "$RG_NAME" \
+    --query "[?contains(hostNames, '$CUSTOM_HOSTNAME')].thumbprint | [0]" \
+    --output tsv)
+  if [[ -n "$CERT_THUMBPRINT" ]]; then
+    break
+  fi
+  echo "Waiting for certificate issuance ($attempt/30)..."
+  sleep 10
+done
+
+if [[ -z "$CERT_THUMBPRINT" ]]; then
+  echo "Certificate issuance did not finish within 5 minutes." >&2
+  exit 1
+fi
 
 az webapp config ssl bind \
   --name "$APP_NAME" \
@@ -400,15 +419,34 @@ az webapp config ssl bind \
 </TabItem>
 <TabItem value="az" label="Azure CLI (az)">
 
-The App Service managed-certificate CLI command is currently in preview. Create
-and bind the certificate:
+The App Service managed-certificate CLI command is currently in preview.
+Certificate issuance is asynchronous, so request the certificate, wait for Azure
+to return its thumbprint, and then bind it:
 
 ```bash
-CERT_THUMBPRINT=$(az webapp config ssl create \
+az webapp config ssl create \
   --name "$APP_NAME" \
   --resource-group "$RG_NAME" \
   --hostname "$CUSTOM_HOSTNAME" \
-  --query thumbprint -o tsv)
+  --output none
+
+CERT_THUMBPRINT=""
+for attempt in {1..30}; do
+  CERT_THUMBPRINT=$(az webapp config ssl list \
+    --resource-group "$RG_NAME" \
+    --query "[?contains(hostNames, '$CUSTOM_HOSTNAME')].thumbprint | [0]" \
+    --output tsv)
+  if [[ -n "$CERT_THUMBPRINT" ]]; then
+    break
+  fi
+  echo "Waiting for certificate issuance ($attempt/30)..."
+  sleep 10
+done
+
+if [[ -z "$CERT_THUMBPRINT" ]]; then
+  echo "Certificate issuance did not finish within 5 minutes." >&2
+  exit 1
+fi
 
 az webapp config ssl bind \
   --name "$APP_NAME" \
