@@ -37,25 +37,19 @@ export default function LandingpageFeatures({ images }: LandingpageFeaturesProps
                 </div>
                 <div className='row'>
                     <div className='col col--6'>
-                        <div className="row">
-                            <div className={styles.largetext}>
-                                Hands-on tutorials to <span className={styles.accenttext}>learn</span> <br />
-                                and <span className={styles.accenttext}>teach</span> <TypewriterComponent words={keywords} />
-                            </div>
+                        <div className={styles.largetext}>
+                            Hands-on tutorials to <span className={styles.accenttext}>learn</span> <br />
+                            and <span className={styles.accenttext}>teach</span> <TypewriterComponent words={keywords} />
                         </div>
-                        <div className="row">
-                            <div className={`${styles.subtitle}`}> 
-                                Grab-and-go resources to help you learn new skills but also <a href="./contributing">contribute</a> your own workshop to help others on their App Service learning journey.
-                            </div>
+                        <div className={styles.subtitle}>
+                            Grab-and-go resources to help you learn new skills but also <a href="./contributing">contribute</a> your own workshop to help others on their App Service learning journey.
                         </div>
-                        <div className='row'>
-                            <div className='{styles.buttons}'>
-                                <Link 
-                                    className="button button--lg button--primary"
-                                    to="/docs/intro">
-                                    Browse Workshops
-                                </Link>
-                            </div>
+                        <div className={styles.buttons}>
+                            <Link
+                                className="button button--lg button--primary"
+                                to="/docs/intro">
+                                Browse Workshops
+                            </Link>
                         </div>
                     </div>
                     <div className='col col--6'>
