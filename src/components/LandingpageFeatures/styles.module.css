@@ -14,11 +14,37 @@
     color: var(--as-accent);
 }
 
-.logo {
-    width: 400px;
-    height: 70px;
-    margin-bottom: 2.0rem;
-    margin-top: 3.0rem;
+.masthead {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.8rem, 2vw, 1.25rem);
+    width: fit-content;
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.mastheadIcon {
+    width: clamp(4.5rem, 8vw, 6rem);
+    height: auto;
+    flex: none;
+}
+
+.mastheadTitle {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3em;
+    color: var(--ifm-color-primary);
+    font-family: var(--ifm-heading-font-family);
+    font-size: clamp(2.15rem, 4.6vw, 3.75rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    text-wrap: balance;
+}
+
+.mastheadLabs {
+    color: var(--as-accent);
+    font-weight: 500;
 }
 
 .img300x300 {
@@ -94,4 +120,16 @@
 .heroWrap > :global(.container) {
     position: relative;
     z-index: 1;
+}
+
+@media (max-width: 576px) {
+    .masthead {
+        align-items: flex-start;
+    }
+
+    .mastheadTitle {
+        flex-direction: column;
+        gap: 0.08em;
+        line-height: 0.95;
+    }
 }

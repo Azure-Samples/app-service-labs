@@ -12,7 +12,7 @@ export default function NotFound(): ReactNode {
         <img
           className={styles.mark}
           src={useBaseUrl('/img/app-service-labs-icon.svg')}
-          alt="App Service Labs logo"
+          alt="Azure App Service Labs logo"
         />
         <p className={styles.code}>404</p>
         <h1 className={styles.title}>This lab bench is empty</h1>

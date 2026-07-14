@@ -23,7 +23,7 @@ const clarityHeadTags: Config['headTags'] = clarityProjectId
   : [];
 
 const config: Config = {
-  title: 'App Service Labs',
+  title: 'Azure App Service Labs',
   tagline: 'Learn Azure App Service by building with App Service',
   favicon: 'img/app-service-labs-icon.svg',
 
@@ -122,9 +122,9 @@ const config: Config = {
     // App Service Labs social card
     image: 'img/app-service-labs-social-card.png',
     navbar: {
-      title: 'App Service Labs',
+      title: 'Azure App Service Labs',
       logo: {
-        alt: 'App Service Labs Logo',
+        alt: 'Azure App Service Labs logo',
         src: 'img/app-service-labs-icon.svg',
       },
       items: [
@@ -208,6 +208,13 @@ const config: Config = {
           ],
         },
       ],
+      logo: {
+        alt: 'Microsoft',
+        src: 'img/microsoft-logo-footer.svg',
+        href: 'https://www.microsoft.com/',
+        width: 188,
+        height: 41,
+      },
       copyright: `Copyright © ${new Date().getFullYear()} Microsoft. Built with Docusaurus.`,
     },
     prism: {

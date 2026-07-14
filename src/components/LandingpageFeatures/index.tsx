@@ -23,8 +23,17 @@ export default function LandingpageFeatures({ images }: LandingpageFeaturesProps
     return (
         <div className={styles.heroWrap}>
             <div className='container no-sidebar'>
-                <div className="row">
-                   <img className={styles.logo} src={useBaseUrl('/img/app-service-labs-logo.svg')}  alt="App Service Labs logo"  />
+                <div className={styles.masthead} aria-label="Azure App Service Labs">
+                    <img
+                        className={styles.mastheadIcon}
+                        src={useBaseUrl('/img/app-service-labs-icon.svg')}
+                        alt=""
+                        aria-hidden="true"
+                    />
+                    <div className={styles.mastheadTitle}>
+                        <span>Azure App Service</span>
+                        <span className={styles.mastheadLabs}>Labs</span>
+                    </div>
                 </div>
                 <div className='row'>
                     <div className='col col--6'>
